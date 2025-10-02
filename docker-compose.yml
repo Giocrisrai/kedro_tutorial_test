@@ -1,0 +1,202 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # SERVICIOS DE PRODUCCIÓN
+  # ===========================================
+  
+  # Servicio principal de Kedro para producción
+  kedro-prod:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.kedro
+    image: spaceflights-kedro:latest
+    container_name: spaceflights-kedro-prod
+    command: kedro run
+    environment:
+      - KEDRO_HOME=/app
+      - KEDRO_CONFIG_FILE=conf/base/parameters.yml
+      - PYTHONPATH=/app/src
+      - KEDRO_ENV=production
+    volumes:
+      - ./data:/app/data
+      - ./conf:/app/conf
+      - ./logs:/app/logs
+      - ./sessions:/app/sessions
+      - ./src:/app/src
+    networks:
+      - spaceflights-network
+    profiles:
+      - production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kedro", "info"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Scheduler para ejecución automática de pipelines
+  kedro-scheduler:
+    image: spaceflights-kedro:latest
+    container_name: spaceflights-kedro-scheduler
+    command: |
+      sh -c "
+      echo '🚀 Iniciando scheduler de Kedro...'
+      while true; do
+        echo '⏰ Ejecutando pipeline programado - $$(date)'
+        kedro run --pipeline data_processing
+        kedro run --pipeline data_science
+        kedro run --pipeline reporting
+        echo '✅ Pipeline completado - $$(date)'
+        echo '⏳ Esperando 1 hora para próxima ejecución...'
+        sleep 3600
+      done
+      "
+    environment:
+      - KEDRO_HOME=/app
+      - KEDRO_CONFIG_FILE=conf/base/parameters.yml
+      - PYTHONPATH=/app/src
+      - KEDRO_ENV=production
+    volumes:
+      - ./data:/app/data
+      - ./conf:/app/conf
+      - ./logs:/app/logs
+      - ./sessions:/app/sessions
+      - ./src:/app/src
+    networks:
+      - spaceflights-network
+    profiles:
+      - production
+    restart: unless-stopped
+    depends_on:
+      - kedro-prod
+
+  # Servicio de JupyterLab para desarrollo
+  jupyter-lab:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.jupyter
+    image: spaceflights-jupyter:latest
+    container_name: spaceflights-jupyter
+    environment:
+      - KEDRO_HOME=/app
+      - KEDRO_CONFIG_FILE=conf/base/parameters.yml
+      - PYTHONPATH=/app/src
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN:-}
+    volumes:
+      - ./data:/app/data
+      - ./conf:/app/conf
+      - ./logs:/app/logs
+      - ./sessions:/app/sessions
+      - ./notebooks:/app/notebooks
+      - ./src:/app/src
+    ports:
+      - "8888:8888"
+    networks:
+      - spaceflights-network
+    profiles:
+      - development
+    restart: unless-stopped
+
+  # ===========================================
+  # SERVICIOS DE DESARROLLO
+  # ===========================================
+
+  # Servicio de Kedro Viz para visualización
+  kedro-viz:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.kedro
+    image: spaceflights-kedro:latest
+    container_name: spaceflights-kedro-viz
+    command: ["kedro", "viz", "--host", "0.0.0.0", "--port", "4141"]
+    environment:
+      - KEDRO_HOME=/app
+      - KEDRO_CONFIG_FILE=conf/base/parameters.yml
+      - PYTHONPATH=/app/src
+    volumes:
+      - ./data:/app/data
+      - ./conf:/app/conf
+      - ./logs:/app/logs
+      - ./sessions:/app/sessions
+      - ./src:/app/src
+    ports:
+      - "4141:4141"
+    networks:
+      - spaceflights-network
+    profiles:
+      - development
+      - production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4141"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Base de datos PostgreSQL para producción
+  postgres:
+    image: postgres:15-alpine
+    container_name: spaceflights-postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-spaceflights}
+      - POSTGRES_USER=${POSTGRES_USER:-kedro}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-kedro123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5433:5432"  # Puerto 5433 para evitar conflicto con PostgreSQL del sistema
+    networks:
+      - spaceflights-network
+    profiles:
+      - database
+      - production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kedro} -d ${POSTGRES_DB:-spaceflights}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis para cache y sesiones
+  redis:
+    image: redis:7-alpine
+    container_name: spaceflights-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - spaceflights-network
+    profiles:
+      - cache
+    restart: unless-stopped
+
+  # Servicio de monitoreo (opcional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: spaceflights-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - spaceflights-network
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+networks:
+  spaceflights-network:
+    driver: bridge

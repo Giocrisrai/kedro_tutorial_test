@@ -1,0 +1,52 @@
+# Dockerfile para el servicio principal de Kedro
+FROM python:3.11-slim
+
+# Metadatos
+LABEL maintainer="spaceflights-team"
+LABEL description="Kedro ML Pipeline Service"
+
+# Variables de entorno
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV KEDRO_HOME=/app
+ENV KEDRO_CONFIG_FILE=conf/base/parameters.yml
+
+# Crear usuario no-root
+RUN groupadd -r kedro && useradd -r -g kedro kedro
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY requirements.txt pyproject.toml ./
+
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copiar código fuente
+COPY src/ ./src/
+COPY conf/ ./conf/
+COPY data/ ./data/
+COPY notebooks/ ./notebooks/
+COPY tests/ ./tests/
+
+# Crear directorios necesarios
+RUN mkdir -p logs sessions && \
+    chown -R kedro:kedro /app
+
+# Cambiar a usuario no-root
+USER kedro
+
+# Exponer puerto para Kedro Viz (si se usa)
+EXPOSE 4141
+
+# Comando por defecto
+CMD ["kedro", "run"]

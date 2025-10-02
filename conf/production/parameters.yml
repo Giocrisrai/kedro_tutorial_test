@@ -1,0 +1,40 @@
+# Production parameters
+model_options:
+  test_size: 0.2
+  random_state: 42
+  features:
+    - "engines"
+    - "passenger_capacity"
+    - "crew"
+    - "d_check_complete"
+    - "moon_clearance_complete"
+    - "iata_approved"
+    - "company_rating"
+    - "review_scores_rating"
+
+# Production-specific parameters
+production:
+  pipeline_schedule: "0 */1 * * *"  # Every hour
+  max_retries: 3
+  timeout: 3600  # 1 hour
+  log_level: "INFO"
+  
+# Data processing parameters for production
+data_processing:
+  batch_size: 1000
+  parallel_processing: true
+  memory_limit: "2GB"
+  
+# Model parameters for production
+data_science:
+  model_type: "LinearRegression"
+  cross_validation: true
+  cv_folds: 5
+  scoring: "r2"
+  
+# Reporting parameters for production
+reporting:
+  generate_charts: true
+  chart_format: "png"
+  chart_dpi: 300
+  include_metadata: true

@@ -1,0 +1,40 @@
+# Configuración de Prometheus para monitoreo de Spaceflights
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Configuración para monitorear el propio Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Configuración para monitorear Kedro Viz
+  - job_name: 'kedro-viz'
+    static_configs:
+      - targets: ['kedro-viz:4141']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Configuración para monitorear JupyterLab
+  - job_name: 'jupyter-lab'
+    static_configs:
+      - targets: ['jupyter-lab:8888']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Configuración para monitorear PostgreSQL (si está habilitado)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    scrape_interval: 30s
+
+  # Configuración para monitorear Redis (si está habilitado)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s

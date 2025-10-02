@@ -1,0 +1,44 @@
+# Dockerfile para JupyterLab - Extensión del Dockerfile.kedro
+FROM spaceflights-kedro:latest
+
+# Metadatos
+LABEL maintainer="spaceflights-team"
+LABEL description="JupyterLab Development Environment for Kedro"
+
+# Variables de entorno para Jupyter
+ENV JUPYTER_ENABLE_LAB=yes
+ENV JUPYTER_TOKEN=""
+ENV JUPYTER_ALLOW_INSECURE_WRITES=true
+
+# Instalar extensiones adicionales de Jupyter
+USER root
+
+RUN pip install --no-cache-dir \
+    jupyterlab-git \
+    jupyterlab-lsp \
+    python-lsp-server[all] \
+    jupyterlab-widgets \
+    ipywidgets \
+    plotly \
+    seaborn
+
+# Configurar JupyterLab
+RUN mkdir -p /home/kedro/.jupyter /home/kedro/.local/share/jupyter/runtime && \
+    chown -R kedro:kedro /home/kedro/.local /home/kedro/.jupyter && \
+    jupyter lab --generate-config && \
+    echo "c.ServerApp.ip = '0.0.0.0'" >> /home/kedro/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.port = 8888" >> /home/kedro/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.open_browser = False" >> /home/kedro/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.allow_root = True" >> /home/kedro/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.token = ''" >> /home/kedro/.jupyter/jupyter_lab_config.py && \
+    echo "c.ServerApp.password = ''" >> /home/kedro/.jupyter/jupyter_lab_config.py && \
+    chown -R kedro:kedro /home/kedro/.jupyter
+
+# Volver a usuario kedro
+USER kedro
+
+# Exponer puerto de JupyterLab
+EXPOSE 8888
+
+# Comando por defecto
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]

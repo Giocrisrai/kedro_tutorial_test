@@ -1,0 +1,255 @@
+[
+  {
+    "event": "before_pipeline_run",
+    "timestamp": "2025-08-20T23:27:12.151825+00:00"
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "companies",
+    "node_id": "aed46479",
+    "status": "Available",
+    "size": 223318
+  },
+  {
+    "event": "after_node_run",
+    "node": "create_confusion_matrix__adb01ae6",
+    "node_id": "d75ec4b0",
+    "duration": 0.05698675000166986,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "dummy_confusion_matrix",
+    "node_id": "369acf98",
+    "status": "Available",
+    "size": 128
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "companies",
+    "node_id": "aed46479",
+    "status": "Available",
+    "size": 223318
+  },
+  {
+    "event": "after_node_run",
+    "node": "preprocess_companies_node",
+    "node_id": "94112458",
+    "duration": 0.00302045900025405,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "preprocessed_companies",
+    "node_id": "493ad53a",
+    "status": "Available",
+    "size": 83192
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "shuttles",
+    "node_id": "f1d596c2",
+    "status": "Available",
+    "size": 936864
+  },
+  {
+    "event": "after_node_run",
+    "node": "preprocess_shuttles_node",
+    "node_id": "acdb05cf",
+    "duration": 0.007670499995583668,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "preprocessed_shuttles",
+    "node_id": "c071dac9",
+    "status": "Available",
+    "size": 247185
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "preprocessed_shuttles",
+    "node_id": "c071dac9",
+    "status": "Available",
+    "size": 247185
+  },
+  {
+    "event": "after_node_run",
+    "node": "compare_passenger_capacity_exp__43c60170",
+    "node_id": "97202ac0",
+    "duration": 0.004649375005101319,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "shuttle_passenger_capacity_plot_exp",
+    "node_id": "a9506115",
+    "status": "Available",
+    "size": 128
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "preprocessed_shuttles",
+    "node_id": "c071dac9",
+    "status": "Available",
+    "size": 247185
+  },
+  {
+    "event": "after_node_run",
+    "node": "compare_passenger_capacity_go__738187f2",
+    "node_id": "81b5866f",
+    "duration": 0.004301333996409085,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "shuttle_passenger_capacity_plot_go",
+    "node_id": "c1311718",
+    "status": "Available",
+    "size": 128
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "preprocessed_shuttles",
+    "node_id": "c071dac9",
+    "status": "Available",
+    "size": 247185
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "preprocessed_companies",
+    "node_id": "493ad53a",
+    "status": "Available",
+    "size": 83192
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "reviews",
+    "node_id": "7b2c6e04",
+    "status": "Available",
+    "size": 588895
+  },
+  {
+    "event": "after_node_run",
+    "node": "create_model_input_table_node",
+    "node_id": "28754fab",
+    "duration": 0.011584084000787698,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "model_input_table",
+    "node_id": "23c94afb",
+    "status": "Available",
+    "size": 212448
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "model_input_table",
+    "node_id": "23c94afb",
+    "status": "Available",
+    "size": 212448
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "params:model_options",
+    "node_id": "ab512939",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_node_run",
+    "node": "split_data_node",
+    "node_id": "329e963c",
+    "duration": 0.0025457919982727617,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "X_train",
+    "node_id": "cae2d1c7",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "X_test",
+    "node_id": "872981f9",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "y_train",
+    "node_id": "9ca016a8",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "y_test",
+    "node_id": "f6d9538c",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "X_train",
+    "node_id": "cae2d1c7",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "y_train",
+    "node_id": "9ca016a8",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_node_run",
+    "node": "train_model_node",
+    "node_id": "2ab3579f",
+    "duration": 0.004598207997332793,
+    "status": "success"
+  },
+  {
+    "event": "after_dataset_saved",
+    "dataset": "regressor",
+    "node_id": "93d834e1",
+    "status": "Available",
+    "size": 128
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "regressor",
+    "node_id": "93d834e1",
+    "status": "Available",
+    "size": 128
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "X_test",
+    "node_id": "872981f9",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_dataset_loaded",
+    "dataset": "y_test",
+    "node_id": "f6d9538c",
+    "status": "Available",
+    "size": 0
+  },
+  {
+    "event": "after_node_run",
+    "node": "evaluate_model_node",
+    "node_id": "24310ef0",
+    "duration": 0.002139417003490962,
+    "status": "success"
+  },
+  {
+    "event": "after_pipeline_run",
+    "timestamp": "2025-08-20T23:27:14.910884+00:00"
+  }
+]
