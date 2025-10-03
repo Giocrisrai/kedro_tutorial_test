@@ -8,7 +8,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.kedro
-    image: spaceflights-kedro:latest
     container_name: spaceflights-kedro-prod
     command: kedro run
     environment:
@@ -35,7 +34,9 @@ services:
 
   # Scheduler para ejecución automática de pipelines
   kedro-scheduler:
-    image: spaceflights-kedro:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.kedro
     container_name: spaceflights-kedro-scheduler
     command: |
       sh -c "
@@ -104,7 +105,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.kedro
-    image: spaceflights-kedro:latest
     container_name: spaceflights-kedro-viz
     command: ["kedro", "viz", "--host", "0.0.0.0", "--port", "4141"]
     environment:

@@ -1,13 +1,48 @@
-# Dockerfile para JupyterLab - Extensión del Dockerfile.kedro
-FROM spaceflights-kedro:latest
+# Dockerfile para JupyterLab - Entorno completo de desarrollo
+FROM python:3.11-slim
 
 # Metadatos
 LABEL maintainer="spaceflights-team"
 LABEL description="JupyterLab Development Environment for Kedro"
 
-# Variables de entorno para Jupyter
+# Variables de entorno
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV KEDRO_HOME=/app
+ENV KEDRO_CONFIG_FILE=conf/base/parameters.yml
 ENV JUPYTER_ENABLE_LAB=yes
 ENV JUPYTER_ALLOW_INSECURE_WRITES=true
+
+# Crear usuario no-root
+RUN groupadd -r kedro && useradd -r -g kedro kedro
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY requirements.txt pyproject.toml ./
+
+# Instalar dependencias de Python (incluyendo Kedro)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copiar código fuente
+COPY src/ ./src/
+COPY conf/ ./conf/
+COPY data/ ./data/
+COPY notebooks/ ./notebooks/
+COPY tests/ ./tests/
+
+# Crear directorios necesarios
+RUN mkdir -p logs sessions && \
+    chown -R kedro:kedro /app
 
 # Instalar extensiones adicionales de Jupyter
 USER root
