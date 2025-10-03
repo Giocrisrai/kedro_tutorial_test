@@ -1,0 +1,20 @@
+# Configuración de Airflow para desarrollo local
+# Hereda de conf/base/airflow.yml y sobrescribe para desarrollo
+
+# Configuración del DAG para desarrollo
+dag:
+  start_date: "2024-01-01"
+  schedule_interval: "@once"  # Ejecutar una sola vez en desarrollo
+  catchup: false
+  max_active_runs: 1
+  description: "Spaceflights ML Pipeline - Development Mode"
+
+# Configuración de logging para desarrollo
+logging:
+  level: "DEBUG"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Configuración de recursos para desarrollo (menos restrictiva)
+resources:
+  cpu_limit: "500m"
+  memory_limit: "1Gi"

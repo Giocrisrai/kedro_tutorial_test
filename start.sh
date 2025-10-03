@@ -56,9 +56,34 @@ case $PROFILE in
         echo "   🗄️  PostgreSQL: localhost:5432"
         echo "   🔄 Redis: localhost:6379"
         ;;
+    "airflow")
+        echo "🚀 Iniciando Airflow..."
+        docker-compose -f docker-compose.airflow.yml up -d
+        echo ""
+        echo "✅ Airflow iniciado:"
+        echo "   🌐 Airflow UI: http://localhost:8080"
+        echo "   👤 Usuario: admin"
+        echo "   🔑 Contraseña: admin"
+        echo ""
+        echo "💡 Comandos útiles:"
+        echo "   Ver logs: docker-compose -f docker-compose.airflow.yml logs -f"
+        echo "   Detener: docker-compose -f docker-compose.airflow.yml down"
+        ;;
+    "all")
+        echo "🌟 Iniciando stack completo con Airflow..."
+        docker-compose --profile development --profile database --profile cache up -d
+        docker-compose -f docker-compose.airflow.yml up -d
+        echo ""
+        echo "✅ Stack completo con Airflow iniciado:"
+        echo "   📊 JupyterLab: http://localhost:8888"
+        echo "   📈 Kedro Viz: http://localhost:4141"
+        echo "   🌐 Airflow UI: http://localhost:8080"
+        echo "   🗄️  PostgreSQL: localhost:5432"
+        echo "   🔄 Redis: localhost:6379"
+        ;;
     *)
         echo "❌ Perfil no válido: $PROFILE"
-        echo "Perfiles disponibles: development, production, full"
+        echo "Perfiles disponibles: development, production, full, airflow, all"
         exit 1
         ;;
 esac

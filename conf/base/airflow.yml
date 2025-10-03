@@ -1,0 +1,49 @@
+# Configuración de Airflow para Spaceflights
+# Este archivo define los parámetros del DAG de Airflow
+
+# Configuración del DAG
+dag:
+  start_date: "2024-01-01"
+  schedule_interval: "@daily"  # Ejecutar diariamente
+  catchup: false  # No ejecutar tareas pasadas
+  max_active_runs: 1  # Solo una ejecución activa a la vez
+  description: "Spaceflights ML Pipeline - Kedro to Airflow"
+
+# Configuración de los operadores
+operators:
+  # Configuración por defecto para todos los operadores
+  default:
+    retries: 2
+    retry_delay: 300  # 5 minutos
+    retry_exponential_backoff: true
+    max_retry_delay: 600  # 10 minutos máximo
+    
+  # Configuración específica para pipelines
+  data_processing:
+    retries: 3
+    retry_delay: 180  # 3 minutos
+    
+  data_science:
+    retries: 1
+    retry_delay: 600  # 10 minutos
+    
+  reporting:
+    retries: 2
+    retry_delay: 300  # 5 minutos
+
+# Configuración de recursos
+resources:
+  # Límites de recursos para las tareas
+  cpu_limit: "1000m"
+  memory_limit: "2Gi"
+  
+# Configuración de notificaciones
+notifications:
+  on_failure: true
+  on_retry: true
+  on_success: false
+
+# Configuración de logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

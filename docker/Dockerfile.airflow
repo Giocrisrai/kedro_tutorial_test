@@ -1,0 +1,58 @@
+# Dockerfile para Apache Airflow con Kedro
+FROM apache/airflow:2.8.0-python3.11
+
+# Metadatos
+LABEL maintainer="spaceflights-team"
+LABEL description="Apache Airflow with Kedro Integration for Spaceflights"
+
+# Cambiar a usuario root para instalar dependencias
+USER root
+
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Cambiar de vuelta al usuario airflow
+USER airflow
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY requirements.txt pyproject.toml ./
+
+# Instalar dependencias de Python (incluyendo Kedro y Airflow)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copiar código fuente del proyecto
+COPY src/ ./src/
+COPY conf/ ./conf/
+COPY data/ ./data/
+COPY notebooks/ ./notebooks/
+COPY tests/ ./tests/
+
+# Crear directorios necesarios para Airflow
+RUN mkdir -p /opt/airflow/dags /opt/airflow/logs /opt/airflow/plugins
+
+# Configurar variables de entorno de Airflow
+ENV AIRFLOW_HOME=/opt/airflow
+ENV AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
+ENV AIRFLOW__CORE__PLUGINS_FOLDER=/opt/airflow/plugins
+ENV AIRFLOW__CORE__EXECUTOR=LocalExecutor
+ENV AIRFLOW__CORE__LOAD_EXAMPLES=False
+ENV AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=True
+
+# Configurar variables de entorno de Kedro
+ENV KEDRO_HOME=/app
+ENV KEDRO_CONFIG_FILE=conf/base/parameters.yml
+ENV PYTHONPATH=/app/src
+
+# Exponer puerto de Airflow
+EXPOSE 8080
+
+# Comando por defecto
+CMD ["airflow", "webserver", "--port", "8080"]

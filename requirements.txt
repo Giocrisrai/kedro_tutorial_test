@@ -6,3 +6,8 @@ kedro-datasets[pandas-csvdataset, pandas-exceldataset, pandas-parquetdataset, pl
 kedro-viz>=6.7.0
 scikit-learn~=1.5.1
 seaborn~=0.12.1
+
+# Airflow dependencies
+apache-airflow>=2.8.0
+kedro-airflow>=0.4.0
+psycopg2-binary>=2.9.0
