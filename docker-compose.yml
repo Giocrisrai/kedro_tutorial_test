@@ -106,7 +106,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.kedro
     container_name: spaceflights-kedro-viz
-    command: ["kedro", "viz", "--host", "0.0.0.0", "--port", "4141"]
+    command: ["kedro", "viz", "run", "--host", "0.0.0.0", "--port", "4141"]
     environment:
       - KEDRO_HOME=/app
       - KEDRO_CONFIG_FILE=conf/base/parameters.yml
