@@ -7,7 +7,6 @@ LABEL description="JupyterLab Development Environment for Kedro"
 
 # Variables de entorno para Jupyter
 ENV JUPYTER_ENABLE_LAB=yes
-ENV JUPYTER_TOKEN=""
 ENV JUPYTER_ALLOW_INSECURE_WRITES=true
 
 # Instalar extensiones adicionales de Jupyter

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ===========================================
   # SERVICIOS DE PRODUCCIÓN
@@ -82,7 +80,6 @@ services:
       - KEDRO_HOME=/app
       - KEDRO_CONFIG_FILE=conf/base/parameters.yml
       - PYTHONPATH=/app/src
-      - JUPYTER_TOKEN=${JUPYTER_TOKEN:-}
     volumes:
       - ./data:/app/data
       - ./conf:/app/conf
