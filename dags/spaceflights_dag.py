@@ -49,7 +49,7 @@ conf_source = "" or Path.cwd() / "conf"
 # Using a DAG context manager, you don't have to specify the dag property of each task
 with DAG(
     dag_id="spaceflights",
-    start_date=datetime(2023,1,1),
+    start_date=datetime(2025,10,1),
     max_active_runs=3,
     # https://airflow.apache.org/docs/stable/scheduler.html#dag-runs
     schedule_interval="@once",

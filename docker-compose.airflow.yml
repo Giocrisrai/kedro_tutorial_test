@@ -153,4 +153,5 @@ volumes:
 
 networks:
   spaceflights-network:
-    external: true
+    name: spaceflights-network
+    driver: bridge
