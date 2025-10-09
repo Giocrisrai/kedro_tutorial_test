@@ -1,8 +1,6 @@
 # Docker Compose para Apache Airflow
 # Integración con el proyecto Spaceflights
 
-version: '3.8'
-
 services:
   # Base de datos PostgreSQL para Airflow
   airflow-postgres:
