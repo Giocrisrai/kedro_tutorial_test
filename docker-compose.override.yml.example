@@ -1,0 +1,41 @@
+# Archivo de override OPCIONAL para desarrollo local
+# 
+# IMPORTANTE: Este es solo un EJEMPLO. Para usarlo:
+# 1. Copia este archivo: cp docker-compose.override.yml.example docker-compose.override.yml
+# 2. Edita según tus necesidades
+# 3. El archivo docker-compose.override.yml se carga automáticamente
+# 4. NO commitees docker-compose.override.yml (está en .gitignore)
+
+services:
+  # Configuración específica para desarrollo
+  jupyter-lab:
+    environment:
+      - KEDRO_ENV=local
+      - KEDRO_LOGGING_LEVEL=DEBUG
+      # Usa variables de entorno en lugar de valores hardcodeados
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN:-}  # Token desde .env o vacío
+    volumes:
+      - ./src:/app/src  # Lectura/escritura para desarrollo
+    # Descomentar si quieres personalizar el comando
+    # command: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+
+  kedro-viz:
+    environment:
+      - KEDRO_ENV=local
+      - KEDRO_LOGGING_LEVEL=DEBUG
+
+  # Configuración de base de datos para desarrollo
+  postgres:
+    environment:
+      # Usa variables de entorno desde .env
+      - POSTGRES_DB=${POSTGRES_DB:-spaceflights_dev}
+      - POSTGRES_USER=${POSTGRES_USER:-kedro_dev}  
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}  # DEBE estar en .env
+    ports:
+      - "5433:5432"  # Puerto 5433 para evitar conflicto con PostgreSQL del sistema
+
+  # Configuración de Redis para desarrollo
+  redis:
+    command: redis-server --appendonly yes --loglevel debug
+    ports:
+      - "6379:6379"
