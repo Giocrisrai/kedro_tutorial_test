@@ -15,16 +15,19 @@ def create_pipeline(**kwargs) -> Pipeline:
                 func=compare_passenger_capacity_exp,
                 inputs="preprocessed_shuttles",
                 outputs="shuttle_passenger_capacity_plot_exp",
+                name="compare_passenger_capacity_exp",
             ),
             Node(
                 func=compare_passenger_capacity_go,
                 inputs="preprocessed_shuttles",
                 outputs="shuttle_passenger_capacity_plot_go",
+                name="compare_passenger_capacity_go",
             ),
             Node(
                 func=create_confusion_matrix,
                 inputs="companies",
                 outputs="dummy_confusion_matrix",
+                name="create_confusion_matrix",
             ),
         ]
     )
