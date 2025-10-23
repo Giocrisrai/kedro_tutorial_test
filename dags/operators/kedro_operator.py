@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from airflow.models import BaseOperator
-from airflow.utils.decorators import apply_defaults
+# apply_defaults is deprecated in newer Airflow versions
 from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
 
@@ -47,7 +47,6 @@ class KedroOperator(BaseOperator):
     ui_color = "#ffc900"  # Kedro yellow
     ui_fgcolor = "#000000"
 
-    @apply_defaults
     def __init__(
         self,
         package_name: str,

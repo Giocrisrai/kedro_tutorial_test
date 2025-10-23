@@ -12,9 +12,9 @@ from __future__ import annotations
 from datetime import timedelta
 
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import BranchPythonOperator
-from airflow.utils.task_group import TaskGroup
+from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.providers.standard.operators.python import BranchPythonOperator
+from airflow.sdk import TaskGroup
 
 from config import (
     DAG_START_DATE,
@@ -71,7 +71,7 @@ with DAG(
     description="Manual trigger for ad-hoc pipeline execution",
     doc_md=DAG_DOC_MD,
     start_date=DAG_START_DATE,
-    schedule_interval=None,  # Manual trigger only
+    schedule=None,  # Manual trigger only
     catchup=False,
     max_active_runs=3,  # Allow multiple parallel manual runs
     default_args=on_demand_args,

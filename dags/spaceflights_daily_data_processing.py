@@ -12,8 +12,8 @@ from __future__ import annotations
 from datetime import timedelta
 
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
-from airflow.utils.task_group import TaskGroup
+from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.sdk import TaskGroup
 
 from config import (
     DAG_START_DATE,
@@ -69,7 +69,7 @@ with DAG(
     description="Process new data every 4 hours",
     doc_md=DAG_DOC_MD,
     start_date=DAG_START_DATE,
-    schedule_interval="0 */4 * * *",  # Every 4 hours
+    schedule="0 */4 * * *",  # Every 4 hours
     catchup=False,
     max_active_runs=1,
     default_args=frequent_run_args,

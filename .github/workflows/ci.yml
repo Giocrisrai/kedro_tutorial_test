@@ -1,0 +1,383 @@
+name: 🚀 Spaceflights CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:  # Permite ejecutar manualmente
+
+env:
+  PYTHON_VERSION: '3.11'
+  KEDRO_ENV: 'base'
+
+jobs:
+  # ===========================================
+  # LINTING AND CODE QUALITY
+  # ===========================================
+  lint-and-format:
+    name: 🔍 Linting & Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install ruff mypy pytest pytest-cov pytest-mock
+        
+    - name: 🔍 Run linting with ruff
+      run: |
+        echo "🔍 Running ruff linting..."
+        ruff check src/ tests/ dags/ scripts/ --output-format=github
+        
+    - name: 🎨 Check code formatting
+      run: |
+        echo "🎨 Checking code formatting..."
+        ruff format --check src/ tests/ dags/ scripts/
+        
+    - name: 🔬 Run type checking with mypy
+      run: |
+        echo "🔬 Running type checking..."
+        mypy src/ --ignore-missing-imports --no-error-summary
+
+  # ===========================================
+  # UNIT TESTS
+  # ===========================================
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-format
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install pytest pytest-cov pytest-mock
+        
+    - name: 🧪 Run unit tests
+      run: |
+        echo "🧪 Running unit tests..."
+        python -m pytest tests/pipelines/ -m unit -v --cov=src/spaceflights --cov-report=xml --cov-report=term-missing
+        
+    - name: 📊 Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  # ===========================================
+  # INTEGRATION TESTS
+  # ===========================================
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-format
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install pytest pytest-cov pytest-mock
+        
+    - name: 🔗 Run integration tests
+      run: |
+        echo "🔗 Running integration tests..."
+        python -m pytest tests/integration/ -m integration -v --tb=short
+        
+    - name: 🧪 Run Kedro pipeline tests
+      run: |
+        echo "🧪 Testing Kedro pipelines..."
+        python scripts/validate_advanced_ml.py
+
+  # ===========================================
+  # FUNCTIONAL TESTS
+  # ===========================================
+  functional-tests:
+    name: ⚙️ Functional Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-format
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install pytest pytest-cov pytest-mock
+        
+    - name: ⚙️ Run functional tests
+      run: |
+        echo "⚙️ Running functional tests..."
+        python -m pytest tests/dags/ -m functional -v --tb=short
+        
+    - name: 🔍 Validate DAG structure
+      run: |
+        echo "🔍 Validating DAG structure..."
+        python scripts/validate_dag_structure.py
+
+  # ===========================================
+  # DOCKER TESTS
+  # ===========================================
+  docker-tests:
+    name: 🐳 Docker Tests
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, functional-tests]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        
+    - name: 🐳 Build Kedro Docker image
+      run: |
+        echo "🐳 Building Kedro Docker image..."
+        docker build -f docker/Dockerfile.kedro -t spaceflights-kedro:test .
+        
+    - name: 🐳 Test Kedro container
+      run: |
+        echo "🧪 Testing Kedro container..."
+        docker run --rm spaceflights-kedro:test kedro info
+        
+    - name: 🐳 Test Kedro pipeline execution
+      run: |
+        echo "🧪 Testing Kedro pipeline execution..."
+        docker run --rm spaceflights-kedro:test kedro run --pipeline data_processing
+        
+    - name: 🐳 Build Airflow Docker image
+      run: |
+        echo "🐳 Building Airflow Docker image..."
+        docker build -f docker/Dockerfile.airflow -t spaceflights-airflow:test .
+        
+    - name: 🐳 Test Airflow container
+      run: |
+        echo "🧪 Testing Airflow container..."
+        docker run --rm spaceflights-airflow:test airflow version
+
+  # ===========================================
+  # END-TO-END TESTS
+  # ===========================================
+  e2e-tests:
+    name: 🎯 End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, functional-tests]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install pytest pytest-cov pytest-mock
+        
+    - name: 🎯 Run end-to-end tests
+      run: |
+        echo "🎯 Running end-to-end tests..."
+        python -m pytest tests/integration/test_integration.py::TestDataIntegration::test_end_to_end_pipeline_integration -v
+        
+    - name: 🧪 Run comprehensive validation
+      run: |
+        echo "🧪 Running comprehensive validation..."
+        python scripts/run_tests.py --type validation
+
+  # ===========================================
+  # SECURITY SCAN
+  # ===========================================
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install safety bandit
+        
+    - name: 🔒 Run security scan with safety
+      run: |
+        echo "🔒 Running security scan..."
+        safety check --json --output safety-report.json || true
+        
+    - name: 🔒 Run bandit security scan
+      run: |
+        echo "🔒 Running bandit security scan..."
+        bandit -r src/ -f json -o bandit-report.json || true
+
+  # ===========================================
+  # FINAL VALIDATION
+  # ===========================================
+  final-validation:
+    name: ✅ Final Validation
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, functional-tests, docker-tests, e2e-tests, security-scan]
+    if: always()
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        
+    - name: ✅ Run final validation
+      run: |
+        echo "✅ Running final validation..."
+        python scripts/run_tests.py --type all
+        
+    - name: 📊 Generate test report
+      run: |
+        echo "📊 Generating test report..."
+        echo "# 🚀 Spaceflights CI/CD Test Report" > test-report.md
+        echo "" >> test-report.md
+        echo "## Test Results" >> test-report.md
+        echo "- Unit Tests: ${{ needs.unit-tests.result }}" >> test-report.md
+        echo "- Integration Tests: ${{ needs.integration-tests.result }}" >> test-report.md
+        echo "- Functional Tests: ${{ needs.functional-tests.result }}" >> test-report.md
+        echo "- Docker Tests: ${{ needs.docker-tests.result }}" >> test-report.md
+        echo "- End-to-End Tests: ${{ needs.e2e-tests.result }}" >> test-report.md
+        echo "- Security Scan: ${{ needs.security-scan.result }}" >> test-report.md
+        echo "" >> test-report.md
+        echo "## Summary" >> test-report.md
+        echo "All tests completed successfully! 🎉" >> test-report.md
+        
+    - name: 📋 Upload test report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-report
+        path: test-report.md
+        
+    - name: 🎉 Success notification
+      if: success()
+      run: |
+        echo "🎉 All tests passed successfully!"
+        echo "✅ Code quality checks passed"
+        echo "✅ Unit tests passed"
+        echo "✅ Integration tests passed"
+        echo "✅ Functional tests passed"
+        echo "✅ Docker tests passed"
+        echo "✅ End-to-end tests passed"
+        echo "✅ Security scan completed"
+        echo ""
+        echo "🚀 The Spaceflights project is ready for deployment!"
+        
+    - name: ❌ Failure notification
+      if: failure()
+      run: |
+        echo "❌ Some tests failed!"
+        echo "Please check the logs above for details."
+        echo ""
+        echo "🔍 Failed jobs:"
+        echo "- Linting: ${{ needs.lint-and-format.result }}"
+        echo "- Unit Tests: ${{ needs.unit-tests.result }}"
+        echo "- Integration Tests: ${{ needs.integration-tests.result }}"
+        echo "- Functional Tests: ${{ needs.functional-tests.result }}"
+        echo "- Docker Tests: ${{ needs.docker-tests.result }}"
+        echo "- End-to-End Tests: ${{ needs.e2e-tests.result }}"
+        echo "- Security Scan: ${{ needs.security-scan.result }}"

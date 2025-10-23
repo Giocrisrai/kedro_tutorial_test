@@ -14,8 +14,8 @@ from __future__ import annotations
 from datetime import timedelta
 
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
-from airflow.utils.task_group import TaskGroup
+from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.sdk import TaskGroup
 
 from config import (
     DAG_START_DATE,
@@ -72,7 +72,7 @@ with DAG(
     description="Complete ML pipeline: data processing → training → reporting",
     doc_md=DAG_DOC_MD,
     start_date=DAG_START_DATE,
-    schedule_interval="0 2 * * *",  # Daily at 2 AM UTC
+    schedule="0 2 * * *",  # Daily at 2 AM UTC
     catchup=False,
     max_active_runs=1,  # One run at a time
     default_args=DEFAULT_DAG_ARGS,

@@ -10,3 +10,48 @@ model_options:
     - iata_approved
     - company_rating
     - review_scores_rating
+
+# Advanced ML pipeline parameters
+advanced_ml:
+  test_size: 0.2
+  random_state: 42
+  cv_folds: 5
+  stratify: true
+  features:
+    - engines
+    - passenger_capacity
+    - crew
+    - d_check_complete
+    - moon_clearance_complete
+    - iata_approved
+    - company_rating
+    - review_scores_rating
+  model_output_path: "data/06_models/advanced_ml"
+  # Regression model parameters
+  regression_models:
+    ridge:
+      alpha: [0.1, 1.0, 10.0, 100.0]
+      solver: ["auto", "svd", "cholesky", "lsqr", "saga"]
+    random_forest:
+      n_estimators: [50, 100, 200]
+      max_depth: [None, 10, 20, 30]
+      min_samples_split: [2, 5, 10]
+    svr:
+      C: [0.1, 1.0, 10.0]
+      gamma: ["scale", "auto", 0.001, 0.01, 0.1]
+      kernel: ["rbf", "linear", "poly"]
+  # Classification model parameters
+  classification_models:
+    logistic_regression:
+      C: [0.1, 1.0, 10.0, 100.0]
+      penalty: ["l1", "l2", "elasticnet"]
+      solver: ["liblinear", "saga"]
+    random_forest:
+      n_estimators: [50, 100, 200]
+      max_depth: [None, 10, 20, 30]
+      min_samples_split: [2, 5, 10]
+      class_weight: ["balanced", None]
+    svc:
+      C: [0.1, 1.0, 10.0]
+      gamma: ["scale", "auto", 0.001, 0.01, 0.1]
+      kernel: ["rbf", "linear", "poly"]

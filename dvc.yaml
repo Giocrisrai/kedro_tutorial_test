@@ -1,0 +1,68 @@
+# DVC configuration for Spaceflights ML project
+# This file defines DVC pipelines and stages for model training and evaluation
+
+stages:
+  # Data processing stage
+  data_processing:
+    cmd: kedro run --pipeline data_processing
+    deps:
+    - data/01_raw/companies.csv
+    - data/01_raw/reviews.csv
+    - data/01_raw/shuttles.xlsx
+    - conf/base/parameters_data_processing.yml
+    outs:
+    - data/02_intermediate/preprocessed_companies.parquet
+    - data/02_intermediate/preprocessed_shuttles.parquet
+    - data/03_primary/model_input_table.parquet
+    metrics:
+    - data/02_intermediate/data_quality_metrics.json
+    plots:
+    - data/02_intermediate/data_distribution_plots.html
+
+  # Basic ML pipeline stage
+  basic_ml:
+    cmd: kedro run --pipeline data_science
+    deps:
+    - data/03_primary/model_input_table.parquet
+    - conf/base/parameters_data_science.yml
+    outs:
+    - data/06_models/regressor.pickle
+    - data/07_model_output/predictions.parquet
+    metrics:
+    - data/07_model_output/model_metrics.json
+    plots:
+    - data/08_reporting/model_performance_plots.html
+
+  # Advanced ML pipeline stage
+  advanced_ml:
+    cmd: kedro run --pipeline advanced_ml
+    deps:
+    - data/03_primary/model_input_table.parquet
+    - conf/base/parameters_data_science.yml
+    outs:
+    - data/06_models/advanced_ml/regression/
+    - data/06_models/advanced_ml/classification/
+    - data/07_model_output/advanced_ml_predictions.parquet
+    - data/07_model_output/model_comparison_report.pkl
+    metrics:
+    - data/07_model_output/advanced_ml_metrics.json
+    plots:
+    - data/08_reporting/advanced_ml_performance_plots.html
+    - data/08_reporting/model_comparison_plots.html
+
+  # Reporting stage
+  reporting:
+    cmd: kedro run --pipeline reporting
+    deps:
+    - data/02_intermediate/preprocessed_shuttles.parquet
+    - data/06_models/regressor.pickle
+    - data/06_models/advanced_ml/
+    outs:
+    - data/08_reporting/shuttle_passenger_capacity_plot_exp.json
+    - data/08_reporting/shuttle_passenger_capacity_plot_go.json
+    - data/08_reporting/dummy_confusion_matrix.png
+    - data/08_reporting/advanced_ml_reports.html
+
+# DVC configuration
+remote: default
+

@@ -12,9 +12,9 @@ from __future__ import annotations
 from datetime import timedelta
 
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
-from airflow.sensors.external_task import ExternalTaskSensor
-from airflow.utils.task_group import TaskGroup
+from airflow.providers.standard.operators.empty import EmptyOperator
+from airflow.providers.standard.sensors.external_task import ExternalTaskSensor
+from airflow.sdk import TaskGroup
 
 from config import (
     DAG_START_DATE,
@@ -67,7 +67,7 @@ with DAG(
     description="Weekly model retraining and evaluation",
     doc_md=DAG_DOC_MD,
     start_date=DAG_START_DATE,
-    schedule_interval="0 3 * * 0",  # Every Sunday at 3 AM
+    schedule="0 3 * * 0",  # Every Sunday at 3 AM
     catchup=False,
     max_active_runs=1,
     default_args=DEFAULT_DAG_ARGS,

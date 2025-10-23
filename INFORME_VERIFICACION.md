@@ -438,3 +438,14 @@ Para preguntas o soporte:
 - 📋 Consultar `ARCHITECTURE.md`
 - 🔍 Ejecutar scripts de verificación en `/scripts`
 
+
+
+
+
+
+
+
+
+
+
+

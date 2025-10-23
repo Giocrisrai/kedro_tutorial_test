@@ -1,0 +1,207 @@
+name: 🔍 Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ===========================================
+  # PR VALIDATION
+  # ===========================================
+  pr-validation:
+    name: 🔍 PR Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install ruff mypy pytest pytest-cov pytest-mock
+        
+    - name: 🔍 Run linting
+      run: |
+        echo "🔍 Running linting checks..."
+        ruff check src/ tests/ dags/ scripts/ --output-format=github
+        
+    - name: 🎨 Check formatting
+      run: |
+        echo "🎨 Checking code formatting..."
+        ruff format --check src/ tests/ dags/ scripts/
+        
+    - name: 🔬 Run type checking
+      run: |
+        echo "🔬 Running type checking..."
+        mypy src/ --ignore-missing-imports --no-error-summary
+
+  # ===========================================
+  # QUICK TESTS
+  # ===========================================
+  quick-tests:
+    name: ⚡ Quick Tests
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        uv pip install pytest pytest-cov pytest-mock
+        
+    - name: ⚡ Run quick unit tests
+      run: |
+        echo "⚡ Running quick unit tests..."
+        python -m pytest tests/pipelines/data_science/test_pipeline.py -v --tb=short
+        
+    - name: 🧪 Run validation scripts
+      run: |
+        echo "🧪 Running validation scripts..."
+        python scripts/validate_dag_structure.py
+
+  # ===========================================
+  # DOCKER BUILD TEST
+  # ===========================================
+  docker-build-test:
+    name: 🐳 Docker Build Test
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: 📦 Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        
+    - name: 📦 Install dependencies
+      run: |
+        uv pip install --upgrade pip
+        uv pip install -r requirements.txt
+        
+    - name: 🐳 Build Kedro Docker image
+      run: |
+        echo "🐳 Building Kedro Docker image..."
+        docker build -f docker/Dockerfile.kedro -t spaceflights-kedro:pr-test .
+        
+    - name: 🐳 Test Kedro container
+      run: |
+        echo "🧪 Testing Kedro container..."
+        docker run --rm spaceflights-kedro:pr-test kedro info
+        
+    - name: 🐳 Build Airflow Docker image
+      run: |
+        echo "🐳 Building Airflow Docker image..."
+        docker build -f docker/Dockerfile.airflow -t spaceflights-airflow:pr-test .
+        
+    - name: 🐳 Test Airflow container
+      run: |
+        echo "🧪 Testing Airflow container..."
+        docker run --rm spaceflights-airflow:pr-test airflow version
+
+  # ===========================================
+  # PR SUMMARY
+  # ===========================================
+  pr-summary:
+    name: 📋 PR Summary
+    runs-on: ubuntu-latest
+    needs: [pr-validation, quick-tests, docker-build-test]
+    if: always()
+    
+    steps:
+    - name: 📋 Create PR summary
+      run: |
+        echo "📋 Creating PR summary..."
+        
+        # Create summary file
+        cat > pr-summary.md << EOF
+        # 🔍 Pull Request Validation Summary
+        
+        ## ✅ Validation Results
+        
+        - **Code Quality**: ${{ needs.pr-validation.result == 'success' && '✅ Passed' || '❌ Failed' }}
+        - **Quick Tests**: ${{ needs.quick-tests.result == 'success' && '✅ Passed' || '❌ Failed' }}
+        - **Docker Build**: ${{ needs.docker-build-test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+        
+        ## 📊 Overall Status
+        
+        ${{ needs.pr-validation.result == 'success' && needs.quick-tests.result == 'success' && needs.docker-build-test.result == 'success' && '🎉 **All checks passed!** This PR is ready for review.' || '⚠️ **Some checks failed.** Please review the logs and fix the issues before merging.' }}
+        
+        ## 🔍 What was tested
+        
+        - Code linting and formatting
+        - Type checking
+        - Unit tests
+        - Docker image builds
+        - Container functionality
+        
+        ## 📝 Next Steps
+        
+        ${{ needs.pr-validation.result == 'success' && needs.quick-tests.result == 'success' && needs.docker-build-test.result == 'success' && '1. ✅ All validations passed' || '1. ❌ Fix the failing checks above' }}
+        ${{ needs.pr-validation.result == 'success' && needs.quick-tests.result == 'success' && needs.docker-build-test.result == 'success' && '2. 🔍 Ready for code review' || '2. 🔍 Review the error logs' }}
+        ${{ needs.pr-validation.result == 'success' && needs.quick-tests.result == 'success' && needs.docker-build-test.result == 'success' && '3. 🚀 Can be merged to main' || '3. 🔧 Fix issues and re-run checks' }}
+        
+        EOF
+        
+        # Display summary
+        cat pr-summary.md
+        
+    - name: 📋 Upload PR summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: pr-summary
+        path: pr-summary.md
+        
+    - name: 💬 Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('pr-summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });
