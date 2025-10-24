@@ -48,6 +48,7 @@ class TestDataIntegration:
             "shuttles": pd.DataFrame(
                 {
                     "id": [1, 2, 3, 4, 5],
+                    "company_id": [1, 2, 3, 4, 5],  # Added for merge operation
                     "engines": [1, 2, 3, 4, 5],
                     "passenger_capacity": [10, 20, 30, 40, 50],
                     "crew": [2, 3, 4, 5, 6],
