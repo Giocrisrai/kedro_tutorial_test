@@ -547,11 +547,14 @@ def create_model_comparison_report(
     if "best_models" in report and "regression" in report["best_models"]:
         report["best_regression_model"] = report["best_models"]["regression"]["model"]
     if "best_models" in report and "classification" in report["best_models"]:
-        report["best_classification_model"] = report["best_models"]["classification"]["model"]
-    
+        report["best_classification_model"] = report["best_models"]["classification"][
+            "model"
+        ]
+
     # Add summary
     report["summary"] = {
-        "total_models": len(report.get("regression_models", {})) + len(report.get("classification_models", {})),
+        "total_models": len(report.get("regression_models", {}))
+        + len(report.get("classification_models", {})),
         "best_regression": report.get("best_regression_model", "N/A"),
         "best_classification": report.get("best_classification_model", "N/A"),
     }
