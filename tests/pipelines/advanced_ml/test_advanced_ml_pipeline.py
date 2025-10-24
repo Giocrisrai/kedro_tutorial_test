@@ -66,6 +66,7 @@ def advanced_ml_parameters():
 class TestDataPreparation:
     """Test data preparation functions"""
 
+    @pytest.mark.unit
     def test_prepare_regression_data(self, sample_data, advanced_ml_parameters):
         """Test regression data preparation"""
         X, y = prepare_regression_data(sample_data, advanced_ml_parameters)
@@ -76,6 +77,7 @@ class TestDataPreparation:
         assert "price" not in X.columns
         assert all(col in X.columns for col in advanced_ml_parameters["features"])
 
+    @pytest.mark.unit
     def test_prepare_classification_data(self, sample_data, advanced_ml_parameters):
         """Test classification data preparation"""
         X, y, label_encoder = prepare_classification_data(
@@ -93,6 +95,7 @@ class TestDataPreparation:
 class TestFeatureScaling:
     """Test feature scaling functions"""
 
+    @pytest.mark.unit
     def test_scale_features(self, sample_data, advanced_ml_parameters):
         """Test feature scaling"""
         X, y = prepare_regression_data(sample_data, advanced_ml_parameters)
@@ -111,6 +114,7 @@ class TestFeatureScaling:
 class TestModelTraining:
     """Test model training functions"""
 
+    @pytest.mark.unit
     def test_train_regression_models(self, sample_data, advanced_ml_parameters):
         """Test regression model training"""
         X, y = prepare_regression_data(sample_data, advanced_ml_parameters)
@@ -131,6 +135,7 @@ class TestModelTraining:
             assert "cv_scores" in model_info
             assert "params" in model_info
 
+    @pytest.mark.unit
     def test_train_classification_models(self, sample_data, advanced_ml_parameters):
         """Test classification model training"""
         X, y, label_encoder = prepare_classification_data(
@@ -157,6 +162,7 @@ class TestModelTraining:
 class TestModelEvaluation:
     """Test model evaluation functions"""
 
+    @pytest.mark.unit
     def test_evaluate_regression_models(self, sample_data, advanced_ml_parameters):
         """Test regression model evaluation"""
         X, y = prepare_regression_data(sample_data, advanced_ml_parameters)
@@ -178,6 +184,7 @@ class TestModelEvaluation:
             assert "test_rmse" in metrics
             assert "test_mae" in metrics
 
+    @pytest.mark.unit
     def test_evaluate_classification_models(self, sample_data, advanced_ml_parameters):
         """Test classification model evaluation"""
         X, y, label_encoder = prepare_classification_data(
@@ -208,6 +215,7 @@ class TestModelEvaluation:
 class TestReportGeneration:
     """Test report generation functions"""
 
+    @pytest.mark.unit
     def test_create_model_comparison_report(self, sample_data, advanced_ml_parameters):
         """Test model comparison report generation"""
         # Create mock evaluations
@@ -248,6 +256,7 @@ class TestReportGeneration:
 class TestAdvancedMLPipeline:
     """Test the complete Advanced ML pipeline"""
 
+    @pytest.mark.unit
     def test_advanced_ml_pipeline_structure(self):
         """Test that the pipeline has the expected structure"""
         pipeline = create_pipeline()
@@ -276,6 +285,7 @@ class TestAdvancedMLPipeline:
         for expected_node in expected_nodes:
             assert expected_node in node_names
 
+    @pytest.mark.unit
     def test_advanced_ml_pipeline_execution(
         self, caplog, sample_data, advanced_ml_parameters
     ):

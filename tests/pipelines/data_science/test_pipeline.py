@@ -47,6 +47,7 @@ def dummy_parameters():
     return parameters
 
 
+@pytest.mark.unit
 def test_split_data(dummy_data, dummy_parameters):
     X_train, X_test, y_train, y_test = split_data(
         dummy_data, dummy_parameters["model_options"]
@@ -57,6 +58,7 @@ def test_split_data(dummy_data, dummy_parameters):
     assert len(y_test) == 1
 
 
+@pytest.mark.unit
 def test_split_data_missing_price(dummy_data, dummy_parameters):
     dummy_data_missing_price = dummy_data.drop(columns="price")
     with pytest.raises(KeyError) as e_info:
@@ -67,6 +69,7 @@ def test_split_data_missing_price(dummy_data, dummy_parameters):
     assert "price" in str(e_info.value)
 
 
+@pytest.mark.unit
 def test_data_science_pipeline(caplog, dummy_data, dummy_parameters):
     pipeline = (
         create_ds_pipeline()
@@ -86,6 +89,7 @@ def test_data_science_pipeline(caplog, dummy_data, dummy_parameters):
     assert "Model has a coefficient R^2 of" in caplog.text
 
 
+@pytest.mark.unit
 def test_train_model(dummy_data, dummy_parameters):
     """Test that the train_model function works correctly."""
     from spaceflights.pipelines.data_science.nodes import train_model
@@ -103,6 +107,7 @@ def test_train_model(dummy_data, dummy_parameters):
     assert hasattr(model, "fit")
 
 
+@pytest.mark.unit
 def test_evaluate_model(dummy_data, dummy_parameters):
     """Test that the evaluate_model function works correctly."""
     from spaceflights.pipelines.data_science.nodes import evaluate_model, train_model
