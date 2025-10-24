@@ -3,9 +3,9 @@
 Test script to verify that pytest can discover and run tests correctly
 """
 
-import sys
-import subprocess
 import os
+import subprocess
+import sys
 
 
 def test_pytest_discovery():

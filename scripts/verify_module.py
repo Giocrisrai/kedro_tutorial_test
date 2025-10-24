@@ -3,8 +3,8 @@
 Verify that the spaceflights module can be imported correctly
 """
 
-import sys
 import os
+import sys
 
 
 def verify_module():
