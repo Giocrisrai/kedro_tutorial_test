@@ -36,13 +36,13 @@ fi
 echo ""
 echo "📊 Verificando DAGs..."
 DAG_COUNT=$(ls -1 dags/*.py 2>/dev/null | grep -v -E "backup|config|__init__" | wc -l | tr -d ' ')
-if [ "$DAG_COUNT" -eq 4 ]; then
-    echo "   ✅ 4 DAGs encontrados"
+if [ "$DAG_COUNT" -ge 4 ]; then
+    echo "   ✅ $DAG_COUNT DAGs encontrados"
     ls -1 dags/spaceflights_*.py | grep -v backup | while read f; do
         echo "      • $(basename $f)"
     done
 else
-    echo "   ⚠️  Se esperaban 4 DAGs, se encontraron $DAG_COUNT"
+    echo "   ⚠️  Se esperaban al menos 4 DAGs, se encontraron $DAG_COUNT"
     ERRORS=$((ERRORS + 1))
 fi
 
@@ -65,20 +65,20 @@ fi
 echo ""
 echo "🔄 Verificando pipelines de Kedro..."
 PIPELINE_COUNT=$(ls -d src/spaceflights/pipelines/*/ 2>/dev/null | grep -v __pycache__ | wc -l | tr -d ' ')
-if [ "$PIPELINE_COUNT" -eq 3 ]; then
-    echo "   ✅ 3 pipelines encontrados"
-    echo "      • data_processing"
-    echo "      • data_science"
-    echo "      • reporting"
+if [ "$PIPELINE_COUNT" -ge 3 ]; then
+    echo "   ✅ $PIPELINE_COUNT pipelines encontrados"
+    ls -d src/spaceflights/pipelines/*/ 2>/dev/null | grep -v __pycache__ | while read d; do
+        echo "      • $(basename $d)"
+    done
 else
-    echo "   ⚠️  Se esperaban 3 pipelines, se encontraron $PIPELINE_COUNT"
+    echo "   ⚠️  Se esperaban al menos 3 pipelines, se encontraron $PIPELINE_COUNT"
     ERRORS=$((ERRORS + 1))
 fi
 
 # Verificar documentación
 echo ""
 echo "📚 Verificando documentación..."
-DOC_FILES=("README.md" "INFORME_VERIFICACION.md" "VERIFICACION_RAPIDA.md")
+DOC_FILES=("README.md" "ARCHITECTURE.md" "CONTRIBUTING.md")
 DOC_COUNT=0
 for file in "${DOC_FILES[@]}"; do
     if [ -f "$file" ]; then
@@ -116,6 +116,19 @@ if [ -f "scripts/validate_dag_structure.py" ]; then
         echo "   ✅ Validación exitosa (ver detalles con: python3 scripts/validate_dag_structure.py)"
     else
         echo "   ⚠️  Validación con advertencias"
+        ERRORS=$((ERRORS + 1))
+    fi
+fi
+
+# Verificar tests
+echo ""
+echo "🧪 Verificando tests..."
+if [ -f "scripts/validate_tests.py" ]; then
+    python3 scripts/validate_tests.py > /tmp/test_validation.log 2>&1
+    if [ $? -eq 0 ]; then
+        echo "   ✅ Tests validados correctamente"
+    else
+        echo "   ⚠️  Tests con problemas"
         ERRORS=$((ERRORS + 1))
     fi
 fi
