@@ -31,9 +31,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copiar código fuente del proyecto
 COPY src/ ./src/
 COPY conf/ ./conf/
-COPY data/ ./data/
 COPY notebooks/ ./notebooks/
 COPY tests/ ./tests/
+
+# Crear directorio data (los datos se montarán en runtime)
+RUN mkdir -p ./data
 
 # Crear directorios necesarios para Airflow
 RUN mkdir -p /opt/airflow/dags /opt/airflow/logs /opt/airflow/plugins

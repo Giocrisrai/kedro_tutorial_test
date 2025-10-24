@@ -34,9 +34,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copiar código fuente
 COPY src/ ./src/
 COPY conf/ ./conf/
-COPY data/ ./data/
 COPY notebooks/ ./notebooks/
 COPY tests/ ./tests/
+
+# Crear directorio data (los datos se montarán en runtime)
+RUN mkdir -p ./data
 
 # Crear directorios necesarios
 RUN mkdir -p logs sessions && \
