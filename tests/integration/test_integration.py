@@ -33,15 +33,15 @@ class TestDataIntegration:
                         "Company D",
                         "Company E",
                     ],
-                    "company_rating": [4.5, 3.2, 4.8, 4.1, 3.9],
-                    "review_scores_rating": [4.2, 3.5, 4.7, 4.0, 3.8],
+                    "company_rating": ["4.5%", "3.2%", "4.8%", "4.1%", "3.9%"],
+                    "review_scores_rating": ["4.2%", "3.5%", "4.7%", "4.0%", "3.8%"],
                     "iata_approved": [True, False, True, True, False],
                 }
             ),
             "reviews": pd.DataFrame(
                 {
                     "id": [1, 2, 3, 4, 5],
-                    "review_scores_rating": [4.2, 3.5, 4.7, 4.0, 3.8],
+                    "review_scores_rating": ["4.2%", "3.5%", "4.7%", "4.0%", "3.8%"],
                 }
             ),
             "shuttles": pd.DataFrame(
