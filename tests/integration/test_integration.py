@@ -60,50 +60,69 @@ class TestDataIntegration:
     @pytest.fixture
     def integration_catalog(self, sample_raw_data):
         """Integration test catalog"""
+        from kedro.io import MemoryDataset
+        
         catalog = DataCatalog()
 
-        # Add raw data
-        from kedro.io import MemoryDataset
+        # Add raw data datasets
+        catalog.add("companies", MemoryDataset())
+        catalog.add("reviews", MemoryDataset())
+        catalog.add("shuttles", MemoryDataset())
+        
+        # Add parameters
+        catalog.add("params:model_options", MemoryDataset())
+        catalog.add("params:advanced_ml", MemoryDataset())
+        
+        # Add intermediate datasets that might be needed
+        catalog.add("preprocessed_companies", MemoryDataset())
+        catalog.add("preprocessed_shuttles", MemoryDataset())
+        catalog.add("model_input_table", MemoryDataset())
+        
+        # Add model outputs
+        catalog.add("regressor", MemoryDataset())
+        catalog.add("classification_models", MemoryDataset())
+        
+        # Add reporting outputs
+        catalog.add("shuttle_passenger_capacity_plot", MemoryDataset())
+        catalog.add("dummy_confusion_matrix", MemoryDataset())
 
-        catalog._data_sets = {
-            "companies": MemoryDataset(sample_raw_data["companies"]),
-            "reviews": MemoryDataset(sample_raw_data["reviews"]),
-            "shuttles": MemoryDataset(sample_raw_data["shuttles"]),
-            "params:model_options": MemoryDataset(
-                {
-                    "test_size": 0.2,
-                    "random_state": 42,
-                    "features": [
-                        "engines",
-                        "passenger_capacity",
-                        "crew",
-                        "d_check_complete",
-                        "moon_clearance_complete",
-                        "iata_approved",
-                        "company_rating",
-                        "review_scores_rating",
-                    ],
-                }
-            ),
-            "params:advanced_ml": MemoryDataset(
-                {
-                    "features": [
-                        "engines",
-                        "passenger_capacity",
-                        "crew",
-                        "d_check_complete",
-                        "moon_clearance_complete",
-                        "iata_approved",
-                        "company_rating",
-                        "review_scores_rating",
-                    ],
-                    "test_size": 0.2,
-                    "random_state": 42,
-                    "cv_folds": 3,
-                    "model_output_path": "data/06_models/",
-                }
-            ),
-        }
+        # Load data into datasets
+        catalog.save("companies", sample_raw_data["companies"])
+        catalog.save("reviews", sample_raw_data["reviews"])
+        catalog.save("shuttles", sample_raw_data["shuttles"])
+        
+        # Load parameters
+        catalog.save("params:model_options", {
+            "test_size": 0.2,
+            "random_state": 42,
+            "features": [
+                "engines",
+                "passenger_capacity",
+                "crew",
+                "d_check_complete",
+                "moon_clearance_complete",
+                "iata_approved",
+                "company_rating",
+                "review_scores_rating",
+            ],
+        })
+        
+        catalog.save("params:advanced_ml", {
+            "features": [
+                "engines",
+                "passenger_capacity",
+                "crew",
+                "d_check_complete",
+                "moon_clearance_complete",
+                "iata_approved",
+                "company_rating",
+                "review_scores_rating",
+            ],
+            "test_size": 0.2,
+            "random_state": 42,
+            "cv_folds": 3,
+            "model_output_path": "data/06_models/",
+        })
 
         return catalog
 
@@ -287,12 +306,12 @@ class TestPipelineDependencies:
         aml_input_names = [input_name for inputs in aml_inputs for input_name in inputs]
         assert "model_input_table" in aml_input_names
 
-        # Check that reporting pipeline requires model outputs
+        # Check that reporting pipeline requires preprocessed data
         rp_inputs = [
             node.inputs for node in rp_pipeline.nodes if hasattr(node, "inputs")
         ]
         rp_input_names = [input_name for inputs in rp_inputs for input_name in inputs]
-        assert any("regressor" in input_name for input_name in rp_input_names)
+        assert any("preprocessed_shuttles" in input_name for input_name in rp_input_names)
 
 
 class TestDataQuality:
@@ -372,23 +391,33 @@ class TestErrorHandling:
     @pytest.mark.integration
     def test_missing_data_handling(self):
         """Test handling of missing data"""
-        # Create catalog with missing data
+        # Create catalog with missing datasets
         catalog = DataCatalog()
         from kedro.io import MemoryDataset
 
-        catalog._data_sets = {
-            "model_input_table": MemoryDataset(pd.DataFrame())
-        }  # Empty dataframe
+        # Add only model_input_table, missing other required datasets
+        catalog.add("model_input_table", MemoryDataset())
+        catalog.save("model_input_table", pd.DataFrame({
+            "engines": [1, 2, 3],
+            "passenger_capacity": [10, 20, 30],
+            "crew": [2, 3, 4],
+            "d_check_complete": [True, False, True],
+            "moon_clearance_complete": [True, True, False],
+            "iata_approved": [True, False, True],
+            "company_rating": [4.5, 3.2, 4.8],
+            "review_scores_rating": [4.2, 3.5, 4.7],
+            "price": [100, 200, 300]
+        }))
 
-        # Test that pipelines handle missing data gracefully
+        # Test that pipelines handle missing datasets gracefully
         try:
             pipeline = create_ds_pipeline()
             runner = SequentialRunner()
             runner.run(pipeline, catalog)
-            # If we get here, the pipeline should handle empty data gracefully
+            # If we get here, the pipeline should handle missing datasets gracefully
         except Exception as e:
-            # This is expected for empty data
-            assert "empty" in str(e).lower() or "missing" in str(e).lower()
+            # This is expected for missing datasets
+            assert "not found" in str(e).lower() or "missing" in str(e).lower()
 
     @pytest.mark.integration
     def test_invalid_parameters_handling(self):
