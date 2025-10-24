@@ -7,15 +7,14 @@ Useful for testing, experiments, and one-off runs.
 Schedule: Manual trigger only
 Author: MLOps Team
 """
+
 from __future__ import annotations
 
 from datetime import timedelta
 
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
-from airflow.providers.standard.operators.python import BranchPythonOperator
 from airflow.sdk import TaskGroup
-
 from config import (
     DAG_START_DATE,
     DEFAULT_DAG_ARGS,
@@ -61,10 +60,12 @@ Monitor execution in real-time via:
 
 # Custom args for on-demand runs
 on_demand_args = DEFAULT_DAG_ARGS.copy()
-on_demand_args.update({
-    "retries": 1,  # Less retries for manual runs
-    "retry_delay": timedelta(minutes=1),
-})
+on_demand_args.update(
+    {
+        "retries": 1,  # Less retries for manual runs
+        "retry_delay": timedelta(minutes=1),
+    }
+)
 
 with DAG(
     dag_id="spaceflights_on_demand",
@@ -77,7 +78,6 @@ with DAG(
     default_args=on_demand_args,
     tags=TAGS["ML"] + TAGS["DEVELOPMENT"] + ["on-demand", "manual"],
 ) as dag:
-
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end", trigger_rule="none_failed_min_one_success")
 
@@ -85,7 +85,6 @@ with DAG(
     # DATA PROCESSING
     # =====================================================
     with TaskGroup("data_processing") as data_processing:
-        
         preprocess_companies = KedroOperator(
             task_id="preprocess_companies",
             package_name=KEDRO_PACKAGE_NAME,
@@ -122,7 +121,6 @@ with DAG(
     # MODEL TRAINING
     # =====================================================
     with TaskGroup("model_training") as training:
-        
         split_data = KedroOperator(
             task_id="split_data",
             package_name=KEDRO_PACKAGE_NAME,
@@ -159,7 +157,6 @@ with DAG(
     # REPORTING
     # =====================================================
     with TaskGroup("reporting") as reporting:
-        
         generate_plots = KedroOperator(
             task_id="generate_all_plots",
             package_name=KEDRO_PACKAGE_NAME,
@@ -176,4 +173,3 @@ with DAG(
 
     # Complete pipeline flow
     start >> data_processing >> training >> reporting >> end
-

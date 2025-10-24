@@ -1,6 +1,7 @@
 """
 Common configuration for all Airflow DAGs in the Spaceflights project.
 """
+
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -35,4 +36,3 @@ TAGS = {
     "PRODUCTION": ["production", "automated"],
     "DEVELOPMENT": ["development", "testing"],
 }
-

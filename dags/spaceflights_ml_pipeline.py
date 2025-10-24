@@ -9,6 +9,7 @@ This DAG orchestrates the complete machine learning workflow:
 Schedule: Daily at 2 AM UTC
 Author: MLOps Team
 """
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -16,7 +17,6 @@ from datetime import timedelta
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.sdk import TaskGroup
-
 from config import (
     DAG_START_DATE,
     DEFAULT_DAG_ARGS,
@@ -78,7 +78,6 @@ with DAG(
     default_args=DEFAULT_DAG_ARGS,
     tags=TAGS["ML"] + TAGS["PRODUCTION"],
 ) as dag:
-
     # Start and end markers
     start = EmptyOperator(
         task_id="start",
@@ -94,8 +93,9 @@ with DAG(
     # =====================================================
     # DATA PROCESSING STAGE
     # =====================================================
-    with TaskGroup("data_processing", tooltip="Clean and prepare raw data") as data_processing:
-        
+    with TaskGroup(
+        "data_processing", tooltip="Clean and prepare raw data"
+    ) as data_processing:
         preprocess_companies = KedroOperator(
             task_id="preprocess_companies",
             package_name=KEDRO_PACKAGE_NAME,
@@ -106,12 +106,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Preprocess Companies
-            
+
             Cleans and standardizes company data:
             - Removes null values
             - Converts boolean columns
             - Standardizes company names
-            
+
             **Input**: `companies.csv`
             **Output**: `preprocessed_companies.parquet`
             """,
@@ -128,12 +128,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Preprocess Shuttles
-            
+
             Cleans and prepares shuttle data:
             - Extracts engine information
             - Removes missing values
             - Standardizes formats
-            
+
             **Input**: `shuttles.xlsx`
             **Output**: `preprocessed_shuttles.parquet`
             """,
@@ -150,12 +150,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Create Model Input Table
-            
+
             Joins preprocessed data for model training:
             - Merges companies and shuttles data
             - Adds review information
             - Creates final training dataset
-            
+
             **Inputs**: preprocessed data + reviews
             **Output**: `model_input_table.parquet`
             """,
@@ -168,8 +168,9 @@ with DAG(
     # =====================================================
     # DATA SCIENCE STAGE
     # =====================================================
-    with TaskGroup("data_science", tooltip="Train and evaluate ML models") as data_science:
-        
+    with TaskGroup(
+        "data_science", tooltip="Train and evaluate ML models"
+    ) as data_science:
         split_data = KedroOperator(
             task_id="split_data",
             package_name=KEDRO_PACKAGE_NAME,
@@ -180,11 +181,11 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Split Data
-            
+
             Splits data into training and test sets:
             - Applies configured test_size ratio
             - Uses random_state for reproducibility
-            
+
             **Input**: `model_input_table.parquet`
             **Outputs**: X_train, X_test, y_train, y_test
             """,
@@ -201,12 +202,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Train Model
-            
+
             Trains linear regression model:
             - Uses training data
             - Fits model parameters
             - Saves versioned model
-            
+
             **Inputs**: X_train, y_train
             **Output**: `regressor.pickle` (versioned)
             """,
@@ -223,12 +224,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Evaluate Model
-            
+
             Evaluates model performance:
             - Calculates R², MAE, RMSE
             - Logs metrics
             - Validates model quality
-            
+
             **Inputs**: regressor, X_test, y_test
             **Output**: Metrics logged
             """,
@@ -241,8 +242,9 @@ with DAG(
     # =====================================================
     # REPORTING STAGE
     # =====================================================
-    with TaskGroup("reporting", tooltip="Generate visualizations and reports") as reporting:
-        
+    with TaskGroup(
+        "reporting", tooltip="Generate visualizations and reports"
+    ) as reporting:
         plot_capacity_express = KedroOperator(
             task_id="plot_passenger_capacity_express",
             package_name=KEDRO_PACKAGE_NAME,
@@ -253,9 +255,9 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Passenger Capacity Plot (Plotly Express)
-            
+
             Creates bar chart of shuttle passenger capacity.
-            
+
             **Input**: `preprocessed_shuttles.parquet`
             **Output**: `shuttle_passenger_capacity_plot_exp.json` (versioned)
             """,
@@ -272,9 +274,9 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Passenger Capacity Plot (Graph Objects)
-            
+
             Creates bar chart using Plotly Graph Objects.
-            
+
             **Input**: `preprocessed_shuttles.parquet`
             **Output**: `shuttle_passenger_capacity_plot_go.json` (versioned)
             """,
@@ -291,9 +293,9 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Confusion Matrix
-            
+
             Creates confusion matrix visualization.
-            
+
             **Output**: `dummy_confusion_matrix.png` (versioned)
             """,
             sla=timedelta(minutes=5),
@@ -306,4 +308,3 @@ with DAG(
     # PIPELINE FLOW
     # =====================================================
     start >> data_processing >> data_science >> reporting >> end
-

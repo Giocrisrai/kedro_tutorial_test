@@ -11,6 +11,7 @@ This DAG orchestrates the advanced machine learning workflow:
 Schedule: Weekly on Sundays at 3 AM UTC
 Author: MLOps Team
 """
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -18,7 +19,6 @@ from datetime import timedelta
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.sdk import TaskGroup
-
 from config import (
     DAG_START_DATE,
     DEFAULT_DAG_ARGS,
@@ -103,9 +103,10 @@ with DAG(
     catchup=False,
     max_active_runs=1,  # One run at a time
     default_args=DEFAULT_DAG_ARGS,
-    tags=TAGS["ML"] + TAGS["PRODUCTION"] + ["advanced", "cross-validation", "grid-search", "dvc"],
+    tags=TAGS["ML"]
+    + TAGS["PRODUCTION"]
+    + ["advanced", "cross-validation", "grid-search", "dvc"],
 ) as dag:
-
     # Start and end markers
     start = EmptyOperator(
         task_id="start",
@@ -121,8 +122,9 @@ with DAG(
     # =====================================================
     # DATA PROCESSING STAGE
     # =====================================================
-    with TaskGroup("data_processing", tooltip="Clean and prepare raw data") as data_processing:
-        
+    with TaskGroup(
+        "data_processing", tooltip="Clean and prepare raw data"
+    ) as data_processing:
         preprocess_companies = KedroOperator(
             task_id="preprocess_companies",
             package_name=KEDRO_PACKAGE_NAME,
@@ -133,12 +135,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Preprocess Companies
-            
+
             Cleans and standardizes company data:
             - Removes null values
             - Converts boolean columns
             - Standardizes company names
-            
+
             **Input**: `companies.csv`
             **Output**: `preprocessed_companies.parquet`
             """,
@@ -155,12 +157,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Preprocess Shuttles
-            
+
             Cleans and prepares shuttle data:
             - Extracts engine information
             - Removes missing values
             - Standardizes formats
-            
+
             **Input**: `shuttles.xlsx`
             **Output**: `preprocessed_shuttles.parquet`
             """,
@@ -177,12 +179,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Create Model Input Table
-            
+
             Joins preprocessed data for model training:
             - Merges companies and shuttles data
             - Adds review information
             - Creates final training dataset
-            
+
             **Inputs**: preprocessed data + reviews
             **Output**: `model_input_table.parquet`
             """,
@@ -195,8 +197,9 @@ with DAG(
     # =====================================================
     # ADVANCED ML PIPELINE STAGE
     # =====================================================
-    with TaskGroup("advanced_ml", tooltip="Advanced ML with cross-validation and grid search") as advanced_ml:
-        
+    with TaskGroup(
+        "advanced_ml", tooltip="Advanced ML with cross-validation and grid search"
+    ) as advanced_ml:
         # Data preparation
         prepare_regression_data = KedroOperator(
             task_id="prepare_regression_data",
@@ -208,12 +211,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Prepare Regression Data
-            
+
             Prepares data for regression tasks:
             - Selects features for regression
             - Creates continuous target variable (price)
             - Handles missing values
-            
+
             **Input**: `model_input_table.parquet`
             **Outputs**: X_reg, y_reg
             """,
@@ -230,12 +233,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Prepare Classification Data
-            
+
             Prepares data for classification tasks:
             - Creates categorical target based on price quartiles
             - Encodes target labels
             - Selects features for classification
-            
+
             **Input**: `model_input_table.parquet`
             **Outputs**: X_clf, y_clf, label_encoder
             """,
@@ -253,12 +256,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Split Regression Data
-            
+
             Splits regression data with cross-validation:
             - Train/test split with stratification
             - Creates 5-fold cross-validation splitter
             - Ensures reproducible splits
-            
+
             **Inputs**: X_reg, y_reg, parameters
             **Outputs**: X_reg_train, X_reg_test, y_reg_train, y_reg_test, cv_splitter_reg
             """,
@@ -275,12 +278,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Split Classification Data
-            
+
             Splits classification data with cross-validation:
             - Train/test split with stratification
             - Creates 5-fold cross-validation splitter
             - Maintains class distribution
-            
+
             **Inputs**: X_clf, y_clf, parameters
             **Outputs**: X_clf_train, X_clf_test, y_clf_train, y_clf_test, cv_splitter_clf
             """,
@@ -298,12 +301,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Scale Regression Features
-            
+
             Scales features for regression models:
             - StandardScaler for consistent feature ranges
             - Fits on training data, transforms test data
             - Preserves feature names and indices
-            
+
             **Inputs**: X_reg_train, X_reg_test
             **Outputs**: X_reg_train_scaled, X_reg_test_scaled, scaler_reg
             """,
@@ -320,12 +323,12 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Scale Classification Features
-            
+
             Scales features for classification models:
             - StandardScaler for consistent feature ranges
             - Fits on training data, transforms test data
             - Preserves feature names and indices
-            
+
             **Inputs**: X_clf_train, X_clf_test
             **Outputs**: X_clf_train_scaled, X_clf_test_scaled, scaler_clf
             """,
@@ -343,14 +346,14 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Train Regression Models
-            
+
             Trains multiple regression models with grid search:
             - Ridge Regression with hyperparameter tuning
             - Random Forest Regressor with grid search
             - Support Vector Regressor with parameter optimization
             - 5-fold cross-validation for each model
             - Comprehensive hyperparameter grids
-            
+
             **Inputs**: X_reg_train_scaled, y_reg_train, cv_splitter_reg, parameters
             **Output**: regression_models (with best parameters and CV scores)
             """,
@@ -367,14 +370,14 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Train Classification Models
-            
+
             Trains multiple classification models with grid search:
             - Logistic Regression with hyperparameter tuning
             - Random Forest Classifier with grid search
             - Support Vector Classifier with parameter optimization
             - 5-fold cross-validation for each model
             - Comprehensive hyperparameter grids
-            
+
             **Inputs**: X_clf_train_scaled, y_clf_train, cv_splitter_clf, parameters
             **Output**: classification_models (with best parameters and CV scores)
             """,
@@ -392,13 +395,13 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Evaluate Regression Models
-            
+
             Evaluates regression models on test set:
             - R² Score for model fit quality
             - Mean Absolute Error (MAE)
             - Root Mean Square Error (RMSE)
             - Comprehensive performance comparison
-            
+
             **Inputs**: regression_models, X_reg_test_scaled, y_reg_test
             **Output**: regression_evaluation (metrics for all models)
             """,
@@ -415,13 +418,13 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Evaluate Classification Models
-            
+
             Evaluates classification models on test set:
             - Accuracy, Precision, Recall, F1-Score
             - Confusion Matrix for detailed analysis
             - ROC AUC Score (multi-class)
             - Comprehensive performance comparison
-            
+
             **Inputs**: classification_models, X_clf_test_scaled, y_clf_test, label_encoder
             **Output**: classification_evaluation (metrics for all models)
             """,
@@ -439,13 +442,13 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Save Regression Models with DVC
-            
+
             Saves regression models with DVC versioning:
             - Serializes best models using joblib
             - Saves metadata (parameters, CV scores)
             - Integrates with DVC for version control
             - Enables model reproducibility and tracking
-            
+
             **Inputs**: regression_models, parameters
             **Output**: regression_dvc_paths (DVC-tracked model paths)
             """,
@@ -462,13 +465,13 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Save Classification Models with DVC
-            
+
             Saves classification models with DVC versioning:
             - Serializes best models using joblib
             - Saves metadata (parameters, CV scores)
             - Integrates with DVC for version control
             - Enables model reproducibility and tracking
-            
+
             **Inputs**: classification_models, parameters
             **Output**: classification_dvc_paths (DVC-tracked model paths)
             """,
@@ -486,13 +489,13 @@ with DAG(
             conf_source=KEDRO_CONF_SOURCE,
             doc_md="""
             ### Create Model Comparison Report
-            
+
             Generates comprehensive model comparison report:
             - Compares all regression and classification models
             - Identifies best performing models
             - Creates detailed performance summary
             - Saves report for analysis and tracking
-            
+
             **Inputs**: regression_evaluation, classification_evaluation, parameters
             **Output**: model_comparison_report (comprehensive analysis)
             """,
@@ -503,9 +506,17 @@ with DAG(
         prepare_regression_data >> split_regression_data
         prepare_classification_data >> split_classification_data
         split_regression_data >> scale_regression_features >> train_regression_models
-        split_classification_data >> scale_classification_features >> train_classification_models
+        (
+            split_classification_data
+            >> scale_classification_features
+            >> train_classification_models
+        )
         train_regression_models >> evaluate_regression_models >> save_regression_models
-        train_classification_models >> evaluate_classification_models >> save_classification_models
+        (
+            train_classification_models
+            >> evaluate_classification_models
+            >> save_classification_models
+        )
         save_regression_models >> create_model_comparison_report
         save_classification_models >> create_model_comparison_report
 
@@ -513,4 +524,3 @@ with DAG(
     # PIPELINE FLOW
     # =====================================================
     start >> data_processing >> advanced_ml >> end
-

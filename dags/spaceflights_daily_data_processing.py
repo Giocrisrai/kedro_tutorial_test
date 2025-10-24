@@ -7,6 +7,7 @@ This DAG is designed for continuous data ingestion scenarios.
 Schedule: Every 4 hours
 Author: MLOps Team
 """
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -14,7 +15,6 @@ from datetime import timedelta
 from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.sdk import TaskGroup
-
 from config import (
     DAG_START_DATE,
     DEFAULT_DAG_ARGS,
@@ -59,10 +59,12 @@ Notifications sent on:
 
 # Custom default args for frequent runs
 frequent_run_args = DEFAULT_DAG_ARGS.copy()
-frequent_run_args.update({
-    "retries": 3,  # More retries for frequent jobs
-    "retry_delay": timedelta(minutes=2),  # Shorter retry delay
-})
+frequent_run_args.update(
+    {
+        "retries": 3,  # More retries for frequent jobs
+        "retry_delay": timedelta(minutes=2),  # Shorter retry delay
+    }
+)
 
 with DAG(
     dag_id="spaceflights_daily_data_processing",
@@ -75,12 +77,10 @@ with DAG(
     default_args=frequent_run_args,
     tags=TAGS["ETL"] + TAGS["PRODUCTION"],
 ) as dag:
-
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end", trigger_rule="none_failed")
 
     with TaskGroup("data_processing", tooltip="Process incoming data") as processing:
-        
         preprocess_companies = KedroOperator(
             task_id="preprocess_companies",
             package_name=KEDRO_PACKAGE_NAME,
@@ -119,4 +119,3 @@ with DAG(
 
     # Pipeline flow
     start >> processing >> end
-

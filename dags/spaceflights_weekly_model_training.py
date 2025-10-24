@@ -7,6 +7,7 @@ This DAG demonstrates scheduled model retraining workflow.
 Schedule: Every Sunday at 3 AM UTC
 Author: MLOps Team
 """
+
 from __future__ import annotations
 
 from datetime import timedelta
@@ -15,7 +16,6 @@ from airflow import DAG
 from airflow.providers.standard.operators.empty import EmptyOperator
 from airflow.providers.standard.sensors.external_task import ExternalTaskSensor
 from airflow.sdk import TaskGroup
-
 from config import (
     DAG_START_DATE,
     DEFAULT_DAG_ARGS,
@@ -73,7 +73,6 @@ with DAG(
     default_args=DEFAULT_DAG_ARGS,
     tags=TAGS["ML"] + TAGS["PRODUCTION"],
 ) as dag:
-
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end", trigger_rule="none_failed")
 
@@ -91,7 +90,6 @@ with DAG(
     # MODEL TRAINING STAGE
     # =====================================================
     with TaskGroup("model_training", tooltip="Train and evaluate models") as training:
-        
         split_data_task = KedroOperator(
             task_id="split_data",
             package_name=KEDRO_PACKAGE_NAME,
@@ -134,8 +132,9 @@ with DAG(
     # =====================================================
     # REPORTING STAGE
     # =====================================================
-    with TaskGroup("reporting", tooltip="Generate model performance reports") as reporting:
-        
+    with TaskGroup(
+        "reporting", tooltip="Generate model performance reports"
+    ) as reporting:
         plot_capacity_exp = KedroOperator(
             task_id="plot_capacity_express",
             package_name=KEDRO_PACKAGE_NAME,
@@ -176,4 +175,3 @@ with DAG(
     # COMPLETE PIPELINE FLOW
     # =====================================================
     start >> wait_for_data >> training >> reporting >> end
-

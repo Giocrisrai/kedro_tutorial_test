@@ -22,11 +22,11 @@ def register_pipelines() -> dict[str, Pipeline]:
         "advanced_ml": advanced_ml.create_pipeline(),
         "reporting": reporting.create_pipeline(),
     }
-    
+
     # Create a comprehensive default pipeline that includes all pipelines
     pipelines["__default__"] = sum(pipelines.values())
-    
+
     # Create a combined ML pipeline (original + advanced)
     pipelines["ml_combined"] = pipelines["data_science"] + pipelines["advanced_ml"]
-    
+
     return pipelines
