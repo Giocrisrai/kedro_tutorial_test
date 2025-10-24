@@ -3,9 +3,9 @@
 Script para verificar la configuración de ruff y mostrar información detallada
 """
 
+import os
 import subprocess
 import sys
-import os
 
 
 def verify_ruff_config():

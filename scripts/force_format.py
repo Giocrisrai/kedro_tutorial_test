@@ -3,9 +3,9 @@
 Script para forzar el formateo de todos los archivos
 """
 
+import os
 import subprocess
 import sys
-import os
 
 
 def force_format():
