@@ -1,5 +1,5 @@
 # Dockerfile para JupyterLab - Entorno completo de desarrollo
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 # Metadatos
 LABEL maintainer="spaceflights-team"
