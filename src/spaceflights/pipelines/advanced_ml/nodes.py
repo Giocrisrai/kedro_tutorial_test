@@ -234,6 +234,7 @@ def train_regression_models(
 
         models[model_name] = {
             "model": grid_search.best_estimator_,
+            "params": config["params"],
             "best_params": grid_search.best_params_,
             "best_score": grid_search.best_score_,
             "cv_scores": cv_scores,
@@ -333,6 +334,7 @@ def train_classification_models(
 
         models[model_name] = {
             "model": grid_search.best_estimator_,
+            "params": config["params"],
             "best_params": grid_search.best_params_,
             "best_score": grid_search.best_score_,
             "cv_scores": cv_scores,
@@ -375,18 +377,18 @@ def evaluate_regression_models(
         y_pred = model.predict(X_test)
 
         metrics = {
-            "r2_score": r2_score(y_test, y_pred),
-            "mae": mean_absolute_error(y_test, y_pred),
-            "mse": mean_squared_error(y_test, y_pred),
-            "rmse": np.sqrt(mean_squared_error(y_test, y_pred)),
+            "test_r2": r2_score(y_test, y_pred),
+            "test_mae": mean_absolute_error(y_test, y_pred),
+            "test_mse": mean_squared_error(y_test, y_pred),
+            "test_rmse": np.sqrt(mean_squared_error(y_test, y_pred)),
         }
 
         evaluation_results[model_name] = metrics
 
         logger.info(f"{model_name} Test Results:")
-        logger.info(f"  R² Score: {metrics['r2_score']:.4f}")
-        logger.info(f"  MAE: {metrics['mae']:.4f}")
-        logger.info(f"  RMSE: {metrics['rmse']:.4f}")
+        logger.info(f"  R² Score: {metrics['test_r2']:.4f}")
+        logger.info(f"  MAE: {metrics['test_mae']:.4f}")
+        logger.info(f"  RMSE: {metrics['test_rmse']:.4f}")
 
     return evaluation_results
 
@@ -418,10 +420,10 @@ def evaluate_classification_models(
         )
 
         metrics = {
-            "accuracy": accuracy_score(y_test, y_pred),
-            "precision": precision_score(y_test, y_pred, average="weighted"),
-            "recall": recall_score(y_test, y_pred, average="weighted"),
-            "f1_score": f1_score(y_test, y_pred, average="weighted"),
+            "test_accuracy": accuracy_score(y_test, y_pred),
+            "test_precision": precision_score(y_test, y_pred, average="weighted"),
+            "test_recall": recall_score(y_test, y_pred, average="weighted"),
+            "test_f1": f1_score(y_test, y_pred, average="weighted"),
             "confusion_matrix": confusion_matrix(y_test, y_pred).tolist(),
         }
 
@@ -437,10 +439,10 @@ def evaluate_classification_models(
         evaluation_results[model_name] = metrics
 
         logger.info(f"{model_name} Test Results:")
-        logger.info(f"  Accuracy: {metrics['accuracy']:.4f}")
-        logger.info(f"  Precision: {metrics['precision']:.4f}")
-        logger.info(f"  Recall: {metrics['recall']:.4f}")
-        logger.info(f"  F1 Score: {metrics['f1_score']:.4f}")
+        logger.info(f"  Accuracy: {metrics['test_accuracy']:.4f}")
+        logger.info(f"  Precision: {metrics['test_precision']:.4f}")
+        logger.info(f"  Recall: {metrics['test_recall']:.4f}")
+        logger.info(f"  F1 Score: {metrics['test_f1']:.4f}")
         if metrics.get("roc_auc"):
             logger.info(f"  ROC AUC: {metrics['roc_auc']:.4f}")
 
@@ -528,12 +530,12 @@ def create_model_comparison_report(
     # Find best classification model
     if classification_results:
         best_clf_model = max(
-            classification_results.items(), key=lambda x: x[1]["f1_score"]
+            classification_results.items(), key=lambda x: x[1]["test_f1"]
         )
         report["best_models"]["classification"] = {
             "model": best_clf_model[0],
-            "f1_score": best_clf_model[1]["f1_score"],
-            "accuracy": best_clf_model[1]["accuracy"],
+            "f1_score": best_clf_model[1]["test_f1"],
+            "accuracy": best_clf_model[1]["test_accuracy"],
         }
 
     # Save report
