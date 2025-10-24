@@ -34,9 +34,9 @@ jobs:
         
     - name: 📦 Install dependencies
       run: |
-        uv pip install --upgrade pip
-        uv pip install -r requirements.txt
-        uv pip install ruff mypy pytest pytest-cov pytest-mock
+        uv pip install --system --upgrade pip
+        uv pip install --system -r requirements.txt
+        uv pip install --system ruff mypy pytest pytest-cov pytest-mock
         
     - name: 🔍 Run linting
       run: |
@@ -77,9 +77,9 @@ jobs:
         
     - name: 📦 Install dependencies
       run: |
-        uv pip install --upgrade pip
-        uv pip install -r requirements.txt
-        uv pip install pytest pytest-cov pytest-mock
+        uv pip install --system --upgrade pip
+        uv pip install --system -r requirements.txt
+        uv pip install --system pytest pytest-cov pytest-mock
         
     - name: ⚡ Run quick unit tests
       run: |
@@ -115,8 +115,8 @@ jobs:
         
     - name: 📦 Install dependencies
       run: |
-        uv pip install --upgrade pip
-        uv pip install -r requirements.txt
+        uv pip install --system --upgrade pip
+        uv pip install --system -r requirements.txt
         
     - name: 🐳 Build Kedro Docker image
       run: |
