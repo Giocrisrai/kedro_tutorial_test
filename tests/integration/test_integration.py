@@ -80,9 +80,7 @@ class TestDataIntegration:
                         "crew",
                         "d_check_complete",
                         "moon_clearance_complete",
-                        "iata_approved",
                         "company_rating",
-                        "review_scores_rating",
                     ],
                 }
             ),
@@ -94,9 +92,7 @@ class TestDataIntegration:
                         "crew",
                         "d_check_complete",
                         "moon_clearance_complete",
-                        "iata_approved",
                         "company_rating",
-                        "review_scores_rating",
                     ],
                     "test_size": 0.2,
                     "random_state": 42,
@@ -127,9 +123,9 @@ class TestDataIntegration:
             runner.run(pipeline, catalog)
 
             # Check that processed data was created
-            assert "preprocessed_companies" in catalog.list()
-            assert "preprocessed_shuttles" in catalog.list()
-            assert "model_input_table" in catalog.list()
+            assert "preprocessed_companies" in catalog.list_datasets()
+            assert "preprocessed_shuttles" in catalog.list_datasets()
+            assert "model_input_table" in catalog.list_datasets()
 
             # Check data quality
             model_input = catalog.load("model_input_table")

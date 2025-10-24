@@ -253,7 +253,7 @@ def train_regression_models(
             f"{model_name} - CV RMSE: {np.sqrt(-cv_scores.mean()):.4f} ± {np.sqrt(cv_scores.std()):.4f}"
         )
 
-    return {"models": models, "results": results}
+    return models
 
 
 def train_classification_models(
@@ -352,7 +352,7 @@ def train_classification_models(
             f"{model_name} - CV F1: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}"
         )
 
-    return {"models": models, "results": results}
+    return models
 
 
 def evaluate_regression_models(
@@ -516,11 +516,11 @@ def create_model_comparison_report(
 
     # Find best regression model
     if regression_results:
-        best_reg_model = min(regression_results.items(), key=lambda x: x[1]["rmse"])
+        best_reg_model = min(regression_results.items(), key=lambda x: x[1]["test_rmse"])
         report["best_models"]["regression"] = {
             "model": best_reg_model[0],
-            "rmse": best_reg_model[1]["rmse"],
-            "r2_score": best_reg_model[1]["r2_score"],
+            "rmse": best_reg_model[1]["test_rmse"],
+            "r2_score": best_reg_model[1]["test_r2"],
         }
 
     # Find best classification model
