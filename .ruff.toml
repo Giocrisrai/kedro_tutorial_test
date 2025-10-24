@@ -1,0 +1,113 @@
+# Ruff configuration file
+# This file is used as a fallback when pyproject.toml is not read correctly
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.8+
+target-version = "py38"
+
+[lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = [
+    "E4",   # pycodestyle errors
+    "E7",   # pycodestyle errors
+    "E9",   # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "PL",   # pylint
+    "RUF",  # ruff-specific rules
+]
+
+ignore = [
+    # Allow non-abstract empty methods in an abstract base class
+    "B027",
+    # Allow boolean positional values in function calls, like `dict.get(... True)`
+    "FBT003",
+    # Ignore checks for possible passwords
+    "S105", "S106", "S107",
+    # Ignore complexity
+    "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+    # Allow print statements (useful for scripts)
+    "T201",
+    # Allow imports in functions (useful for conditional imports)
+    "PLC0415",
+    # Allow unused imports (useful for conditional imports)
+    "F401",
+    # Allow magic values in tests
+    "PLR2004",
+    # Allow loop variable overwriting
+    "PLW2901",
+    # Allow unused variables
+    "F841",
+    # Allow f-strings without placeholders
+    "F541",
+    # Allow unnecessary mode argument
+    "UP015",
+    # Allow non-PEP 585 annotations
+    "UP006",
+    # Allow deprecated typing imports
+    "UP035",
+    # Allow collapsible else-if
+    "PLR5501",
+    # Allow useless expressions (useful for DAGs)
+    "B018",
+    # Allow unused loop variables
+    "B007",
+    # Allow unused unpacked variables
+    "RUF059",
+    # Allow unused noqa directives
+    "RUF100",
+    # Allow implicit string concatenation
+    "RUF010",
+    # Allow trailing whitespace
+    "W291",
+    # Allow blank lines with whitespace
+    "W293",
+    # Allow subprocess.run without explicit check
+    "PLW1510",
+]
+
+# Allow fix for all enabled rules (when `--fix`) except unused-imports (F401).
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.isort]
+known-first-party = ["spaceflights"]
+
+[lint.mccabe]
+max-complexity = 10

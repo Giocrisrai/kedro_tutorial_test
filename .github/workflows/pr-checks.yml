@@ -41,12 +41,12 @@ jobs:
     - name: 🔍 Run linting
       run: |
         echo "🔍 Running linting checks..."
-        ruff check src/ tests/ dags/ scripts/ --output-format=github
+        python3 -m ruff check src/ tests/ dags/ scripts/ --output-format=github
         
     - name: 🎨 Check formatting
       run: |
         echo "🎨 Checking code formatting..."
-        ruff format --check src/ tests/ dags/ scripts/
+        python3 -m ruff format --check src/ tests/ dags/ scripts/
         
     - name: 🔬 Run type checking
       run: |
