@@ -133,7 +133,12 @@ class TestDataIntegration:
             assert "price" in model_input.columns
 
         except Exception as e:
-            pytest.fail(f"Data processing pipeline integration test failed: {e}")
+            # Add more detailed error information
+            import traceback
+
+            pytest.fail(
+                f"Data processing pipeline integration test failed: {e}\nTraceback: {traceback.format_exc()}"
+            )
 
     @pytest.mark.integration
     def test_data_science_pipeline_integration(self, integration_catalog):
@@ -155,7 +160,12 @@ class TestDataIntegration:
             assert model is not None
 
         except Exception as e:
-            pytest.fail(f"Data science pipeline integration test failed: {e}")
+            # Add more detailed error information
+            import traceback
+
+            pytest.fail(
+                f"Data science pipeline integration test failed: {e}\nTraceback: {traceback.format_exc()}"
+            )
 
     @pytest.mark.integration
     def test_advanced_ml_pipeline_integration(self, integration_catalog):
@@ -182,7 +192,12 @@ class TestDataIntegration:
             assert len(classification_models) > 0
 
         except Exception as e:
-            pytest.fail(f"Advanced ML pipeline integration test failed: {e}")
+            # Add more detailed error information
+            import traceback
+
+            pytest.fail(
+                f"Advanced ML pipeline integration test failed: {e}\nTraceback: {traceback.format_exc()}"
+            )
 
     @pytest.mark.integration
     def test_reporting_pipeline_integration(self, integration_catalog):
@@ -211,7 +226,12 @@ class TestDataIntegration:
             )
 
         except Exception as e:
-            pytest.fail(f"Reporting pipeline integration test failed: {e}")
+            # Add more detailed error information
+            import traceback
+
+            pytest.fail(
+                f"Reporting pipeline integration test failed: {e}\nTraceback: {traceback.format_exc()}"
+            )
 
     @pytest.mark.integration
     def test_end_to_end_pipeline_integration(self, integration_catalog):
@@ -258,7 +278,12 @@ class TestDataIntegration:
             assert len(model_input) > 0
 
         except Exception as e:
-            pytest.fail(f"End-to-end pipeline integration test failed: {e}")
+            # Add more detailed error information
+            import traceback
+
+            pytest.fail(
+                f"End-to-end pipeline integration test failed: {e}\nTraceback: {traceback.format_exc()}"
+            )
 
 
 class TestPipelineDependencies:
