@@ -79,8 +79,8 @@ jobs:
         push: true
         tags: ${{ steps.meta-kedro.outputs.tags }}
         labels: ${{ steps.meta-kedro.outputs.labels }}
-        cache-from: type=gha,scope=kedro
-        cache-to: type=gha,mode=max,scope=kedro
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
         outputs: type=registry
         
     - name: 🐳 Build and push Airflow image
@@ -92,8 +92,8 @@ jobs:
         push: true
         tags: ${{ steps.meta-airflow.outputs.tags }}
         labels: ${{ steps.meta-airflow.outputs.labels }}
-        cache-from: type=gha,scope=airflow
-        cache-to: type=gha,mode=max,scope=airflow
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
         outputs: type=registry
 
   # ===========================================
