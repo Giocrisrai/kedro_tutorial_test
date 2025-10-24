@@ -516,7 +516,9 @@ def create_model_comparison_report(
 
     # Find best regression model
     if regression_results:
-        best_reg_model = min(regression_results.items(), key=lambda x: x[1]["test_rmse"])
+        best_reg_model = min(
+            regression_results.items(), key=lambda x: x[1]["test_rmse"]
+        )
         report["best_models"]["regression"] = {
             "model": best_reg_model[0],
             "rmse": best_reg_model[1]["test_rmse"],
