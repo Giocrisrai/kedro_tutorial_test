@@ -543,6 +543,19 @@ def create_model_comparison_report(
     report_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(report, report_path)
 
+    # Add top-level keys for backward compatibility
+    if "best_models" in report and "regression" in report["best_models"]:
+        report["best_regression_model"] = report["best_models"]["regression"]["model"]
+    if "best_models" in report and "classification" in report["best_models"]:
+        report["best_classification_model"] = report["best_models"]["classification"]["model"]
+    
+    # Add summary
+    report["summary"] = {
+        "total_models": len(report.get("regression_models", {})) + len(report.get("classification_models", {})),
+        "best_regression": report.get("best_regression_model", "N/A"),
+        "best_classification": report.get("best_classification_model", "N/A"),
+    }
+
     logger.info(f"Model comparison report saved to {report_path}")
     logger.info(
         f"Best regression model: {report['best_models'].get('regression', {}).get('model', 'N/A')}"
