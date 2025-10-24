@@ -24,7 +24,15 @@ def register_pipelines() -> dict[str, Pipeline]:
     }
 
     # Create a comprehensive default pipeline that includes all pipelines
-    pipelines["__default__"] = sum(pipelines.values())
+    from functools import reduce
+    from operator import add
+    
+    pipeline_list = list(pipelines.values())
+    if pipeline_list:
+        pipelines["__default__"] = reduce(add, pipeline_list)
+    else:
+        from kedro.pipeline import Pipeline
+        pipelines["__default__"] = Pipeline([])
 
     # Create a combined ML pipeline (original + advanced)
     pipelines["ml_combined"] = pipelines["data_science"] + pipelines["advanced_ml"]
