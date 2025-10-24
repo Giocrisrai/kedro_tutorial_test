@@ -61,42 +61,46 @@ class TestDataIntegration:
     def integration_catalog(self, sample_raw_data):
         """Integration test catalog"""
         from kedro.io import MemoryDataset
-        
+
         # Create datasets with data
         datasets = {
             "companies": MemoryDataset(sample_raw_data["companies"]),
             "reviews": MemoryDataset(sample_raw_data["reviews"]),
             "shuttles": MemoryDataset(sample_raw_data["shuttles"]),
-            "params:model_options": MemoryDataset({
-                "test_size": 0.2,
-                "random_state": 42,
-                "features": [
-                    "engines",
-                    "passenger_capacity",
-                    "crew",
-                    "d_check_complete",
-                    "moon_clearance_complete",
-                    "iata_approved",
-                    "company_rating",
-                    "review_scores_rating",
-                ],
-            }),
-            "params:advanced_ml": MemoryDataset({
-                "features": [
-                    "engines",
-                    "passenger_capacity",
-                    "crew",
-                    "d_check_complete",
-                    "moon_clearance_complete",
-                    "iata_approved",
-                    "company_rating",
-                    "review_scores_rating",
-                ],
-                "test_size": 0.2,
-                "random_state": 42,
-                "cv_folds": 3,
-                "model_output_path": "data/06_models/",
-            }),
+            "params:model_options": MemoryDataset(
+                {
+                    "test_size": 0.2,
+                    "random_state": 42,
+                    "features": [
+                        "engines",
+                        "passenger_capacity",
+                        "crew",
+                        "d_check_complete",
+                        "moon_clearance_complete",
+                        "iata_approved",
+                        "company_rating",
+                        "review_scores_rating",
+                    ],
+                }
+            ),
+            "params:advanced_ml": MemoryDataset(
+                {
+                    "features": [
+                        "engines",
+                        "passenger_capacity",
+                        "crew",
+                        "d_check_complete",
+                        "moon_clearance_complete",
+                        "iata_approved",
+                        "company_rating",
+                        "review_scores_rating",
+                    ],
+                    "test_size": 0.2,
+                    "random_state": 42,
+                    "cv_folds": 3,
+                    "model_output_path": "data/06_models/",
+                }
+            ),
             "preprocessed_companies": MemoryDataset(),
             "preprocessed_shuttles": MemoryDataset(),
             "model_input_table": MemoryDataset(),
@@ -105,7 +109,7 @@ class TestDataIntegration:
             "shuttle_passenger_capacity_plot": MemoryDataset(),
             "dummy_confusion_matrix": MemoryDataset(),
         }
-        
+
         catalog = DataCatalog(datasets)
         return catalog
 
@@ -378,22 +382,26 @@ class TestErrorHandling:
         """Test handling of missing data"""
         # Create catalog with missing datasets
         from kedro.io import MemoryDataset
-        
+
         # Add only model_input_table, missing other required datasets
         datasets = {
-            "model_input_table": MemoryDataset(pd.DataFrame({
-                "engines": [1, 2, 3],
-                "passenger_capacity": [10, 20, 30],
-                "crew": [2, 3, 4],
-                "d_check_complete": [True, False, True],
-                "moon_clearance_complete": [True, True, False],
-                "iata_approved": [True, False, True],
-                "company_rating": [4.5, 3.2, 4.8],
-                "review_scores_rating": [4.2, 3.5, 4.7],
-                "price": [100, 200, 300],
-            }))
+            "model_input_table": MemoryDataset(
+                pd.DataFrame(
+                    {
+                        "engines": [1, 2, 3],
+                        "passenger_capacity": [10, 20, 30],
+                        "crew": [2, 3, 4],
+                        "d_check_complete": [True, False, True],
+                        "moon_clearance_complete": [True, True, False],
+                        "iata_approved": [True, False, True],
+                        "company_rating": [4.5, 3.2, 4.8],
+                        "review_scores_rating": [4.2, 3.5, 4.7],
+                        "price": [100, 200, 300],
+                    }
+                )
+            )
         }
-        
+
         catalog = DataCatalog(datasets)
 
         # Test that pipelines handle missing datasets gracefully
