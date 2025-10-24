@@ -16,6 +16,7 @@ sys.path.insert(0, str(dags_dir))
 class TestAirflowDAGs:
     """Test Airflow DAGs functionality"""
 
+    @pytest.mark.functional
     def test_dag_imports(self):
         """Test that all DAGs can be imported without errors"""
         try:
@@ -29,6 +30,7 @@ class TestAirflowDAGs:
         except ImportError as e:
             pytest.fail(f"DAG import failed: {e}")
 
+    @pytest.mark.functional
     def test_advanced_ml_dag_structure(self):
         """Test Advanced ML DAG structure"""
         try:
@@ -49,6 +51,7 @@ class TestAirflowDAGs:
         except Exception as e:
             pytest.fail(f"Advanced ML DAG structure test failed: {e}")
 
+    @pytest.mark.functional
     def test_daily_processing_dag_structure(self):
         """Test Daily Data Processing DAG structure"""
         try:
@@ -69,6 +72,7 @@ class TestAirflowDAGs:
         except Exception as e:
             pytest.fail(f"Daily processing DAG structure test failed: {e}")
 
+    @pytest.mark.functional
     def test_ml_pipeline_dag_structure(self):
         """Test ML Pipeline DAG structure"""
         try:
@@ -89,6 +93,7 @@ class TestAirflowDAGs:
         except Exception as e:
             pytest.fail(f"ML pipeline DAG structure test failed: {e}")
 
+    @pytest.mark.functional
     def test_on_demand_dag_structure(self):
         """Test On-Demand DAG structure"""
         try:
@@ -109,6 +114,7 @@ class TestAirflowDAGs:
         except Exception as e:
             pytest.fail(f"On-demand DAG structure test failed: {e}")
 
+    @pytest.mark.functional
     def test_weekly_training_dag_structure(self):
         """Test Weekly Model Training DAG structure"""
         try:
@@ -129,6 +135,7 @@ class TestAirflowDAGs:
         except Exception as e:
             pytest.fail(f"Weekly training DAG structure test failed: {e}")
 
+    @pytest.mark.functional
     def test_dag_task_dependencies(self):
         """Test that DAGs have proper task dependencies"""
         try:
@@ -289,6 +296,7 @@ class TestDAGConfiguration:
 class TestDAGValidation:
     """Test DAG validation and integrity"""
 
+    @pytest.mark.functional
     def test_all_dags_have_unique_ids(self):
         """Test that all DAGs have unique IDs"""
         try:
