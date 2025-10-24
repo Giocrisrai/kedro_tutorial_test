@@ -97,6 +97,9 @@ tmp/
 # data/06_models/
 # data/07_model_output/
 
+# Excluir archivos de checkpoint de Jupyter
+data/**/.ipynb_checkpoints/
+
 # Archivos de configuración local
 conf/local/
 conf/**/local.yml
