@@ -119,6 +119,18 @@ class TestDataIntegration:
         catalog = integration_catalog
 
         try:
+            # First, verify that input data is available
+            companies = catalog.load("companies")
+            shuttles = catalog.load("shuttles")
+            reviews = catalog.load("reviews")
+
+            assert isinstance(companies, pd.DataFrame)
+            assert isinstance(shuttles, pd.DataFrame)
+            assert isinstance(reviews, pd.DataFrame)
+            assert len(companies) > 0
+            assert len(shuttles) > 0
+            assert len(reviews) > 0
+
             runner = SequentialRunner()
             runner.run(pipeline, catalog)
 
