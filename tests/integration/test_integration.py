@@ -122,13 +122,12 @@ class TestDataIntegration:
             runner = SequentialRunner()
             runner.run(pipeline, catalog)
 
-            # Check that processed data was created
-            assert "preprocessed_companies" in catalog.list()
-            assert "preprocessed_shuttles" in catalog.list()
-            assert "model_input_table" in catalog.list()
+            # Check that processed data was created by trying to load them
+            preprocessed_companies = catalog.load("preprocessed_companies")
+            preprocessed_shuttles = catalog.load("preprocessed_shuttles")
+            model_input = catalog.load("model_input_table")
 
             # Check data quality
-            model_input = catalog.load("model_input_table")
             assert isinstance(model_input, pd.DataFrame)
             assert len(model_input) > 0
             assert "price" in model_input.columns
@@ -151,10 +150,7 @@ class TestDataIntegration:
             ds_pipeline = create_ds_pipeline()
             runner.run(ds_pipeline, catalog)
 
-            # Check that model was created
-            assert "regressor" in catalog.list()
-
-            # Check model quality
+            # Check that model was created by trying to load it
             model = catalog.load("regressor")
             assert model is not None
 
@@ -176,11 +172,7 @@ class TestDataIntegration:
             aml_pipeline = create_aml_pipeline()
             runner.run(aml_pipeline, catalog)
 
-            # Check that models were created
-            assert "regression_models" in catalog.list()
-            assert "classification_models" in catalog.list()
-
-            # Check model quality
+            # Check that models were created by trying to load them
             regression_models = catalog.load("regression_models")
             classification_models = catalog.load("classification_models")
 
@@ -209,10 +201,14 @@ class TestDataIntegration:
             rp_pipeline = create_rp_pipeline()
             runner.run(rp_pipeline, catalog)
 
-            # Check that reports were created
-            assert "dummy_confusion_matrix" in catalog.list()
-            assert "shuttle_passenger_capacity_plot_exp" in catalog.list()
-            assert "shuttle_passenger_capacity_plot_go" in catalog.list()
+            # Check that reports were created by trying to load them
+            dummy_confusion_matrix = catalog.load("dummy_confusion_matrix")
+            shuttle_passenger_capacity_plot_exp = catalog.load(
+                "shuttle_passenger_capacity_plot_exp"
+            )
+            shuttle_passenger_capacity_plot_go = catalog.load(
+                "shuttle_passenger_capacity_plot_go"
+            )
 
         except Exception as e:
             pytest.fail(f"Reporting pipeline integration test failed: {e}")
@@ -251,7 +247,10 @@ class TestDataIntegration:
             ]
 
             for output in expected_outputs:
-                assert output in catalog.list(), f"Expected output {output} not found"
+                try:
+                    catalog.load(output)
+                except Exception as e:
+                    pytest.fail(f"Expected output {output} not found: {e}")
 
             # Verify data quality
             model_input = catalog.load("model_input_table")
