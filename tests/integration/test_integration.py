@@ -100,13 +100,15 @@ class TestDataIntegration:
                     "model_output_path": "data/06_models/",
                 }
             ),
-            "preprocessed_companies": MemoryDataset(),
-            "preprocessed_shuttles": MemoryDataset(),
-            "model_input_table": MemoryDataset(),
-            "regressor": MemoryDataset(),
-            "classification_models": MemoryDataset(),
-            "shuttle_passenger_capacity_plot": MemoryDataset(),
-            "dummy_confusion_matrix": MemoryDataset(),
+            "preprocessed_companies": MemoryDataset(pd.DataFrame()),
+            "preprocessed_shuttles": MemoryDataset(pd.DataFrame()),
+            "model_input_table": MemoryDataset(pd.DataFrame()),
+            "regressor": MemoryDataset(None),
+            "classification_models": MemoryDataset({}),
+            "regression_models": MemoryDataset({}),
+            "shuttle_passenger_capacity_plot_exp": MemoryDataset({}),
+            "shuttle_passenger_capacity_plot_go": MemoryDataset({}),
+            "dummy_confusion_matrix": MemoryDataset(None),
         }
 
         catalog = DataCatalog(datasets)
