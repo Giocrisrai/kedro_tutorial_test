@@ -137,14 +137,20 @@ class TestDataIntegration:
             runner.run(pipeline, catalog)
 
             # Check that processed data was created by trying to load them
-            preprocessed_companies = catalog.load("preprocessed_companies")
-            preprocessed_shuttles = catalog.load("preprocessed_shuttles")
-            model_input = catalog.load("model_input_table")
+            # If the dataset is not saved yet, it means the pipeline didn't run properly
+            try:
+                preprocessed_companies = catalog.load("preprocessed_companies")
+                preprocessed_shuttles = catalog.load("preprocessed_shuttles")
+                model_input = catalog.load("model_input_table")
 
-            # Check data quality
-            assert isinstance(model_input, pd.DataFrame)
-            assert len(model_input) > 0
-            assert "price" in model_input.columns
+                # Check data quality
+                assert isinstance(model_input, pd.DataFrame)
+                assert len(model_input) > 0
+                assert "price" in model_input.columns
+            except Exception as load_error:
+                pytest.fail(
+                    f"Pipeline execution failed - datasets not saved: {load_error}"
+                )
 
         except Exception as e:
             # Add more detailed error information
@@ -170,8 +176,13 @@ class TestDataIntegration:
             runner.run(ds_pipeline, catalog)
 
             # Check that model was created by trying to load it
-            model = catalog.load("regressor")
-            assert model is not None
+            try:
+                model = catalog.load("regressor")
+                assert model is not None
+            except Exception as load_error:
+                pytest.fail(
+                    f"Data science pipeline failed - model not saved: {load_error}"
+                )
 
         except Exception as e:
             # Add more detailed error information
@@ -197,13 +208,18 @@ class TestDataIntegration:
             runner.run(aml_pipeline, catalog)
 
             # Check that models were created by trying to load them
-            regression_models = catalog.load("regression_models")
-            classification_models = catalog.load("classification_models")
+            try:
+                regression_models = catalog.load("regression_models")
+                classification_models = catalog.load("classification_models")
 
-            assert isinstance(regression_models, dict)
-            assert isinstance(classification_models, dict)
-            assert len(regression_models) > 0
-            assert len(classification_models) > 0
+                assert isinstance(regression_models, dict)
+                assert isinstance(classification_models, dict)
+                assert len(regression_models) > 0
+                assert len(classification_models) > 0
+            except Exception as load_error:
+                pytest.fail(
+                    f"Advanced ML pipeline failed - models not saved: {load_error}"
+                )
 
         except Exception as e:
             # Add more detailed error information
