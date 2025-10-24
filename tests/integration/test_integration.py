@@ -123,9 +123,9 @@ class TestDataIntegration:
             runner.run(pipeline, catalog)
 
             # Check that processed data was created
-            assert "preprocessed_companies" in catalog.list_datasets()
-            assert "preprocessed_shuttles" in catalog.list_datasets()
-            assert "model_input_table" in catalog.list_datasets()
+            assert "preprocessed_companies" in catalog.list()
+            assert "preprocessed_shuttles" in catalog.list()
+            assert "model_input_table" in catalog.list()
 
             # Check data quality
             model_input = catalog.load("model_input_table")
@@ -202,16 +202,17 @@ class TestDataIntegration:
 
         try:
             runner = SequentialRunner()
+            # First run data processing pipeline to create preprocessed_shuttles
             runner.run(dp_pipeline, catalog)
-            runner.run(ds_pipeline, catalog)
-
+            
             # Now run reporting pipeline
             rp_pipeline = create_rp_pipeline()
             runner.run(rp_pipeline, catalog)
 
             # Check that reports were created
-            assert "confusion_matrix" in catalog.list()
-            assert "shuttle_passenger_capacity_plot" in catalog.list()
+            assert "dummy_confusion_matrix" in catalog.list()
+            assert "shuttle_passenger_capacity_plot_exp" in catalog.list()
+            assert "shuttle_passenger_capacity_plot_go" in catalog.list()
 
         except Exception as e:
             pytest.fail(f"Reporting pipeline integration test failed: {e}")
@@ -244,8 +245,9 @@ class TestDataIntegration:
                 "regressor",
                 "regression_models",
                 "classification_models",
-                "confusion_matrix",
-                "shuttle_passenger_capacity_plot",
+                "dummy_confusion_matrix",
+                "shuttle_passenger_capacity_plot_exp",
+                "shuttle_passenger_capacity_plot_go",
             ]
 
             for output in expected_outputs:
