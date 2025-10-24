@@ -104,3 +104,35 @@ known-first-party = ["spaceflights"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spaceflights"
+version = "0.1"
+description = "Spaceflights MLOps project"
+requires-python = ">=3.8"
+dependencies = [
+    "kedro>=0.18.0",
+    "pandas>=1.5.0",
+    "numpy>=1.21.0",
+    "scikit-learn>=1.1.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.11.0",
+    "plotly>=5.0.0",
+    "openpyxl>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.8.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
