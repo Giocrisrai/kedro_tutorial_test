@@ -72,7 +72,7 @@ jobs:
           
     - name: 🐳 Build and push Kedro image
       id: build-kedro
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: ./docker/Dockerfile.kedro
@@ -83,7 +83,7 @@ jobs:
         
     - name: 🐳 Build and push Airflow image
       id: build-airflow
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: ./docker/Dockerfile.airflow
