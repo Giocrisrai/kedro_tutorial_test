@@ -83,7 +83,6 @@ def main():
     if not test_file.exists():
         return 1
 
-
     # Verificar importaciones
     success, imports = check_imports(test_file)
     if not success:
@@ -106,7 +105,6 @@ def main():
         pass
     else:
         pass
-
 
     return 0
 

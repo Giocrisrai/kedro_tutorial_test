@@ -66,7 +66,6 @@ def validate_dag_structure(dag_file):
     total = len(checks)
     score = (passed / total) * 100
 
-
     if score == 100:
         return True
     elif score >= 80:
@@ -94,7 +93,6 @@ def main():
 
     total = len(results)
     valid = sum(1 for _, is_valid in results if is_valid)
-
 
     if valid == total:
         pass

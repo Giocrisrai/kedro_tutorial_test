@@ -2,7 +2,6 @@
 Integration tests for the Spaceflights project
 """
 
-
 import numpy as np
 import pandas as pd
 import pytest

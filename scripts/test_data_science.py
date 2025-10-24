@@ -51,7 +51,6 @@ def test_split_data():
 
         X_train, X_test, y_train, y_test = split_data(dummy_data, parameters)
 
-
         # Verificar que las proporciones son correctas
         total_samples = len(dummy_data)
         expected_train = int(total_samples * 0.8)
@@ -92,7 +91,6 @@ def test_train_model():
         y_train = pd.Series([120, 290, 30])
 
         model = train_model(X_train, y_train)
-
 
         # Probar predicción
         model.predict(X_train)
@@ -136,7 +134,6 @@ def test_evaluate_model():
         # Evaluar modelo
         metrics = evaluate_model(model, X_test, y_test)
 
-
         # Verificar tipos
         assert isinstance(metrics, dict), "Métricas deben ser un diccionario"
         assert "r2_score" in metrics, "Debe incluir r2_score"
@@ -156,7 +153,6 @@ def test_pipeline_import():
         from spaceflights.pipelines.data_science import create_pipeline
 
         pipeline = create_pipeline()
-
 
         # Verificar que tiene los nodos esperados
         node_names = [node.name for node in pipeline.nodes]
@@ -185,12 +181,10 @@ def main():
     total = len(tests)
 
     for test_name, test_func in tests:
-
         if test_func():
             passed += 1
         else:
             pass
-
 
     if passed == total:
         return 0

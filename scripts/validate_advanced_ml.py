@@ -48,7 +48,6 @@ def validate_imports() -> bool:
             train_regression_models,
         )
 
-
         return True
 
     except ImportError:
@@ -275,7 +274,6 @@ def print_summary(results: dict[str, bool]) -> None:
 
     for test_name, passed_test in results.items():
         pass
-
 
     if passed == total:
         pass

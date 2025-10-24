@@ -81,7 +81,6 @@ def main():
     passed = sum(1 for _, success, _ in results if success)
     failed = total - passed
 
-
     if failed > 0:
         for name, success, error in results:
             if not success:

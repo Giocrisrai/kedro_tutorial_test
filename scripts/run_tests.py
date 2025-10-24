@@ -12,7 +12,9 @@ def run_command(command, description):
     """Run a command and return the result"""
 
     try:
-        result = subprocess.run(command, check=False, shell=True, capture_output=True, text=True)
+        result = subprocess.run(
+            command, check=False, shell=True, capture_output=True, text=True
+        )
         if result.returncode == 0:
             if result.stdout:
                 pass
@@ -133,7 +135,6 @@ def main():
     parser.add_argument("--type-check", action="store_true", help="Run type checking")
 
     args = parser.parse_args()
-
 
     success = True
 

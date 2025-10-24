@@ -88,7 +88,6 @@ def main():
     if not test_file.exists():
         return 1
 
-
     # Analizar el archivo
     analysis = analyze_test_file(test_file)
 
@@ -99,9 +98,7 @@ def main():
     for issue in issues:
         pass
 
-
     if analysis["syntax_ok"]:
-
         # Verificar funciones específicas esperadas
         expected_tests = [
             "test_split_data",

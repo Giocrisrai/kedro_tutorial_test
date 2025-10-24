@@ -81,7 +81,6 @@ def main():
         if not full_path.exists():
             continue
 
-
         # Test 1: Sintaxis
         total_tests += 1
         success, message = test_syntax(full_path)
@@ -105,7 +104,6 @@ def main():
             passed_tests += 1
         else:
             pass
-
 
     if passed_tests == total_tests:
         return 0

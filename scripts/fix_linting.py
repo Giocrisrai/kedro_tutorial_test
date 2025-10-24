@@ -11,7 +11,9 @@ import sys
 def run_command(cmd, description):
     """Ejecuta un comando y muestra el resultado"""
     try:
-        result = subprocess.run(cmd, check=False, shell=True, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd, check=False, shell=True, capture_output=True, text=True
+        )
         if result.returncode == 0:
             if result.stdout:
                 pass
