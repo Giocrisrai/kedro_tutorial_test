@@ -63,14 +63,12 @@ class TestDataIntegration:
     @pytest.fixture
     def integration_catalog(self, sample_raw_data):
         """Integration test catalog"""
-        from kedro.io import MemoryDataset
-
         # Create datasets with data - use MemoryDataset for inputs, regular datasets for outputs
-        from kedro.io import MemoryDataset
+        from kedro.extras.datasets.matplotlib import MatplotlibWriter
         from kedro.extras.datasets.pandas import ParquetDataset
         from kedro.extras.datasets.pickle import PickleDataset
         from kedro.extras.datasets.plotly import JSONDataset
-        from kedro.extras.datasets.matplotlib import MatplotlibWriter
+        from kedro.io import MemoryDataset
 
         datasets = {
             # Input datasets with data
