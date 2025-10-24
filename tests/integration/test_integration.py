@@ -204,7 +204,7 @@ class TestDataIntegration:
             runner = SequentialRunner()
             # First run data processing pipeline to create preprocessed_shuttles
             runner.run(dp_pipeline, catalog)
-            
+
             # Now run reporting pipeline
             rp_pipeline = create_rp_pipeline()
             runner.run(rp_pipeline, catalog)
