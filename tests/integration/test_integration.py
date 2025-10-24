@@ -107,6 +107,7 @@ class TestDataIntegration:
 
         return catalog
 
+    @pytest.mark.integration
     def test_data_processing_pipeline_integration(self, integration_catalog):
         """Test data processing pipeline integration"""
         pipeline = create_dp_pipeline()
@@ -130,6 +131,7 @@ class TestDataIntegration:
         except Exception as e:
             pytest.fail(f"Data processing pipeline integration test failed: {e}")
 
+    @pytest.mark.integration
     def test_data_science_pipeline_integration(self, integration_catalog):
         """Test data science pipeline integration"""
         # First run data processing
@@ -154,6 +156,7 @@ class TestDataIntegration:
         except Exception as e:
             pytest.fail(f"Data science pipeline integration test failed: {e}")
 
+    @pytest.mark.integration
     def test_advanced_ml_pipeline_integration(self, integration_catalog):
         """Test advanced ML pipeline integration"""
         # First run data processing
@@ -184,6 +187,7 @@ class TestDataIntegration:
         except Exception as e:
             pytest.fail(f"Advanced ML pipeline integration test failed: {e}")
 
+    @pytest.mark.integration
     def test_reporting_pipeline_integration(self, integration_catalog):
         """Test reporting pipeline integration"""
         # First run data processing and data science
@@ -207,6 +211,7 @@ class TestDataIntegration:
         except Exception as e:
             pytest.fail(f"Reporting pipeline integration test failed: {e}")
 
+    @pytest.mark.integration
     def test_end_to_end_pipeline_integration(self, integration_catalog):
         """Test complete end-to-end pipeline integration"""
         catalog = integration_catalog
@@ -253,6 +258,7 @@ class TestDataIntegration:
 class TestPipelineDependencies:
     """Test pipeline dependencies and data flow"""
 
+    @pytest.mark.integration
     def test_pipeline_data_dependencies(self):
         """Test that pipelines have correct data dependencies"""
         dp_pipeline = create_dp_pipeline()
@@ -292,6 +298,7 @@ class TestPipelineDependencies:
 class TestDataQuality:
     """Test data quality across pipelines"""
 
+    @pytest.mark.integration
     def test_data_quality_after_processing(self):
         """Test data quality after processing"""
         # Create sample data
@@ -322,6 +329,7 @@ class TestDataQuality:
             "Price should be numeric"
         )
 
+    @pytest.mark.integration
     def test_model_output_quality(self):
         """Test model output quality"""
         # Create mock model outputs
@@ -361,6 +369,7 @@ class TestDataQuality:
 class TestErrorHandling:
     """Test error handling across pipelines"""
 
+    @pytest.mark.integration
     def test_missing_data_handling(self):
         """Test handling of missing data"""
         # Create catalog with missing data
@@ -381,6 +390,7 @@ class TestErrorHandling:
             # This is expected for empty data
             assert "empty" in str(e).lower() or "missing" in str(e).lower()
 
+    @pytest.mark.integration
     def test_invalid_parameters_handling(self):
         """Test handling of invalid parameters"""
         catalog = DataCatalog()
