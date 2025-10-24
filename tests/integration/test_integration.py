@@ -41,7 +41,7 @@ class TestDataIntegration:
             "reviews": pd.DataFrame(
                 {
                     "id": [1, 2, 3, 4, 5],
-                    "shuttle_id": [1, 2, 3, 4, 5],
+                    "shuttle_id": [1, 2, 3, 4, 5],  # Added for merge operation
                     "review_scores_rating": ["4.2%", "3.5%", "4.7%", "4.0%", "3.8%"],
                 }
             ),
