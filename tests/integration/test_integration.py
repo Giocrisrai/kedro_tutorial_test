@@ -65,8 +65,15 @@ class TestDataIntegration:
         """Integration test catalog"""
         from kedro.io import MemoryDataset
 
-        # Create datasets with data
+        # Create datasets with data - use MemoryDataset for inputs, regular datasets for outputs
+        from kedro.io import MemoryDataset
+        from kedro.extras.datasets.pandas import ParquetDataset
+        from kedro.extras.datasets.pickle import PickleDataset
+        from kedro.extras.datasets.plotly import JSONDataset
+        from kedro.extras.datasets.matplotlib import MatplotlibWriter
+
         datasets = {
+            # Input datasets with data
             "companies": MemoryDataset(sample_raw_data["companies"]),
             "reviews": MemoryDataset(sample_raw_data["reviews"]),
             "shuttles": MemoryDataset(sample_raw_data["shuttles"]),
@@ -100,15 +107,28 @@ class TestDataIntegration:
                     "model_output_path": "data/06_models/",
                 }
             ),
-            "preprocessed_companies": MemoryDataset(),
-            "preprocessed_shuttles": MemoryDataset(),
-            "model_input_table": MemoryDataset(),
-            "regressor": MemoryDataset(),
+            # Output datasets - use regular datasets instead of MemoryDataset
+            "preprocessed_companies": ParquetDataset(
+                "data/02_intermediate/preprocessed_companies.parquet"
+            ),
+            "preprocessed_shuttles": ParquetDataset(
+                "data/02_intermediate/preprocessed_shuttles.parquet"
+            ),
+            "model_input_table": ParquetDataset(
+                "data/03_primary/model_input_table.parquet"
+            ),
+            "regressor": PickleDataset("data/06_models/regressor.pickle"),
             "classification_models": MemoryDataset(),
             "regression_models": MemoryDataset(),
-            "shuttle_passenger_capacity_plot_exp": MemoryDataset(),
-            "shuttle_passenger_capacity_plot_go": MemoryDataset(),
-            "dummy_confusion_matrix": MemoryDataset(),
+            "shuttle_passenger_capacity_plot_exp": JSONDataset(
+                "data/08_reporting/shuttle_passenger_capacity_plot_exp.json"
+            ),
+            "shuttle_passenger_capacity_plot_go": JSONDataset(
+                "data/08_reporting/shuttle_passenger_capacity_plot_go.json"
+            ),
+            "dummy_confusion_matrix": MatplotlibWriter(
+                "data/08_reporting/dummy_confusion_matrix.png"
+            ),
             # Advanced ML pipeline datasets
             "X_reg": MemoryDataset(),
             "y_reg": MemoryDataset(),
