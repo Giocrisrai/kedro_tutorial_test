@@ -81,6 +81,7 @@ jobs:
         uv pip install --system --upgrade pip
         uv pip install --system -r requirements.txt
         uv pip install --system pytest pytest-cov pytest-mock
+        uv pip install --system -e .
         
     - name: 🧪 Run unit tests
       run: |
@@ -122,6 +123,7 @@ jobs:
         uv pip install --system --upgrade pip
         uv pip install --system -r requirements.txt
         uv pip install --system pytest pytest-cov pytest-mock
+        uv pip install --system -e .
         
     - name: 🔗 Run integration tests
       run: |
@@ -160,6 +162,7 @@ jobs:
         uv pip install --system --upgrade pip
         uv pip install --system -r requirements.txt
         uv pip install --system pytest pytest-cov pytest-mock
+        uv pip install --system -e .
         
     - name: ⚙️ Run functional tests
       run: |
