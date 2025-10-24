@@ -53,7 +53,7 @@ class TestDataIntegration:
                     "d_check_complete": [True, False, True, True, False],
                     "moon_clearance_complete": [True, True, False, True, True],
                     "iata_approved": [True, False, True, True, False],
-                    "price": [100, 200, 300, 400, 500],
+                    "price": ["$100", "$200", "$300", "$400", "$500"],
                 }
             ),
         }
