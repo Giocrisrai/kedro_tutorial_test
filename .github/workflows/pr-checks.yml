@@ -187,7 +187,7 @@ jobs:
         cat pr-summary.md
         
     - name: 📋 Upload PR summary
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: pr-summary
         path: pr-summary.md
